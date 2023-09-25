@@ -44,7 +44,7 @@ const SignIn: NextPage<Props> = ({ pageProps }) => {
       description="login">
       <div className="bg-gray w-full p-0">
         <div className="relative overflow-hidden w-full h-screen lg:h-full flex items-center bg-white shadow-default">
-          <div className="">
+          <div className="w-full">
             <Image
               className="w-full absolute object-cover object-center"
               src="/images/barrier-gate.png"
@@ -56,9 +56,9 @@ const SignIn: NextPage<Props> = ({ pageProps }) => {
           </div>
 
           <div className={`w-full lg:max-w-md absolute z-9 bg-white h-full transform duration-300 ease-in-out ${!loadingPage ? "translate-x-0 right-0" : "translate-x-full right-0 invisible"}`}>
-            <div className="w-full h-full flex flex-col">
-              <div className="w-full px-6 lg:px-8 py-5 lg:py-10 flex flex-col">
-                <div className="w-full flex flex-col gap-10 mt-8 mb-10 ">
+            <div className="w-full h-full flex flex-col justify-between">
+              <div className="w-full px-6 lg:px-8 py-5 lg:py-10 flex flex-col gap-14">
+                <div className="w-full flex flex-col gap-24 mt-8">
                   <Image
                     className="mx-auto object-cover object-center"
                     src="/images/logo.png"
@@ -82,7 +82,7 @@ const SignIn: NextPage<Props> = ({ pageProps }) => {
                       <input
                         type="text"
                         placeholder="Fill your username"
-                        className={`w-full rounded-lg border border-stroke bg-transparent py-4 pr-6 pl-10 outline-none focus:border-primary focus-visible:shadow-none`}
+                        className={`w-full rounded-lg border border-stroke bg-transparent py-3.5 pr-6 pl-10 outline-none focus:border-primary focus-visible:shadow-none text-sm`}
                         value={""}
                         readOnly
                         // onChange={onEmailChange}
@@ -91,12 +91,12 @@ const SignIn: NextPage<Props> = ({ pageProps }) => {
                       />
 
                       <MdPerson
-                        className={`absolute left-4 top-4 h-6 w-6 text-gray-5`}
+                        className={`absolute left-4 top-4 h-5 w-5 text-gray-5`}
                       />
                     </div>
                   </div>
 
-                  <div className="mb-5">
+                  <div className="mb-12">
                     <label className="mb-2.5 block font-medium text-black">
                       Password
                     </label>
@@ -104,31 +104,31 @@ const SignIn: NextPage<Props> = ({ pageProps }) => {
                       <input
                         type={isHidden ? "password" : "text"}
                         placeholder="Insert your password"
-                        className={`w-full rounded-lg border border-stroke bg-transparent py-4 pl-10 pr-10 outline-none focus:border-primary focus-visible:shadow-none`}
+                        className={`w-full rounded-lg border border-stroke bg-transparent py-3.5 pl-10 pr-10 outline-none focus:border-primary focus-visible:shadow-none text-sm`}
                         value={""}
                         readOnly
                         // onChange={onPasswordChange}
                       />
-                      <MdLock className="absolute left-4 top-4 h-6 w-6 text-gray-5" />
+                      <MdLock className="absolute left-4 top-4 h-5 w-5 text-gray-5" />
                       <button
                         type="button"
                         className="absolute z-40 right-4 top-4 text-gray-5 focus:outline-none"
                         onClick={() => setIsHidden((prev) => !prev)}>
                         {isHidden ? (
-                          <FaEyeSlash className="w-6 h-6" />
+                          <FaEyeSlash className="w-5 h-5" />
                         ) : (
-                          <FaEye className="w-6 h-6" />
+                          <FaEye className="w-5 h-5" />
                         )}
                       </button>
                     </div>
                   </div>
 
-                  <div className="w-full flex flex-col gap-2 items-center mb-5">
+                  <div className="w-full flex flex-col gap-2 items-center">
                     <div className="w-full">
                       <Button
                         type="button"
                         variant="primary"
-                        className="w-full cursor-pointer rounded-lg border py-4 text-white transition hover:bg-opacity-90"
+                        className="w-full cursor-pointer rounded-lg border py-3.5 text-white transition hover:bg-opacity-90 text-sm"
                         onClick={() => router.push({ pathname: "/" })}
                         disabled={false}>
                         {loading ? (
@@ -145,7 +145,7 @@ const SignIn: NextPage<Props> = ({ pageProps }) => {
                 </form>
               </div>
 
-              <div className="w-full bg-primary px-8 py-10 mt-auto text-center text-white text-sm">
+              <div className="w-full bg-primary px-8 py-10 text-center text-white text-sm">
                   <h3>PT. Triputra Agro Persada &copy; {new Date().getFullYear()}</h3>
               </div>
             </div>

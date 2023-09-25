@@ -140,7 +140,7 @@ const DropdownUser = ({ userDefault, token }: DropdownUserProps) => {
             />
           </span>
 
-          <div className="hidden text-right lg:block text-gray-6">
+          <div className="hidden text-left lg:block text-gray-6">
             <span className="block text-sm font-medium">
               John Doe
             </span>
