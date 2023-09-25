@@ -49,7 +49,7 @@ const DashboardLayouts = ({
 
           {/* <!-- ===== Main Content Start ===== --> */}
           {/* <div className='mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10'> */}
-          <main className="max-w-screen-2xl bg-white p-6 tracking-wide">
+          <main className="max-w-screen-2xl bg-white tracking-wide">
             {children}
           </main>
           {/* <!-- ===== Main Content End ===== --> */}
