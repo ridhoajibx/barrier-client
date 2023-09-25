@@ -255,8 +255,9 @@ export default function Rfid() {
   return (
     <DashboardLayouts
       userDefault="/images/logo.png"
+      logo="/images/logo.png"
       token={""}
-      header={"Log Data"}
+      header={"RFID"}
       title={"title"}>
       <div className="w-full p-0 lg:p-4 relative">
         <div className="w-full grid grid-cols-1 lg:grid-cols-5 gap-2.5 p-4">

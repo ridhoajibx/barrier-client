@@ -190,7 +190,7 @@ const Navbar = ({ header, userDefault, title, token }: HeaderProps) => {
                   href={{ pathname: "/vehicle-type" }}
                   activeClassName=""
                   className="w-full lg:justify-center text-sm lg:text-base text-gray hover:text-white">
-                  Vehiccle Type
+                  Vehicle Type
                 </ActiveLink>
               </div>
             </div>
