@@ -308,7 +308,7 @@ export default function VehicleType() {
                     showYearDropdown
                     disabled={false}
                     clearButtonClassName="after:w-10 after:h-10 h-10 w-10"
-                    className="text-sm lg:text-md w-full text-gray-5 rounded-lg border border-stroke bg-transparent py-4 pl-12 pr-6 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                    className="text-sm lg:text-md w-full text-gray-5 rounded-lg border border-stroke bg-transparent py-4 pl-12 pr-6 outline-none focus:border-primary focus-visible:shadow-none "
                   />
                   <MdOutlineCalendarToday className="absolute left-4 top-4 h-6 w-6 text-gray-5" />
                 </div>

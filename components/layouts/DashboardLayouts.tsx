@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Head from "next/head";
 import Header from "./header";
-import Navbar from "./header/Navbar";
+// import Navbar from "./header/Navbar";
 
 type Props = {
   children?: any;
@@ -25,6 +25,20 @@ const DashboardLayouts = ({
   token,
   icons,
 }: Props) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuItems = [
+    "Profile",
+    "Dashboard",
+    "Activity",
+    "Analytics",
+    "System",
+    "Deployments",
+    "My Settings",
+    "Team Settings",
+    "Help & Feedback",
+    "Log Out",
+  ];
+
   return (
     <div className="">
       <Head>
@@ -44,7 +58,6 @@ const DashboardLayouts = ({
             icons={icons}
           />
 
-          <Navbar />
           {/* <!-- ===== Header End ===== --> */}
 
           {/* <!-- ===== Main Content Start ===== --> */}

@@ -115,6 +115,7 @@ const Navbar = ({ header, userDefault, title, token }: HeaderProps) => {
       body?.classList.remove("navbar-expanded");
     }
   }, [navbarExpanded]);
+
   return (
     <nav className="bg-primary z-99 sticky top-0">
       <div className="mx-4 max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -207,43 +208,41 @@ const Navbar = ({ header, userDefault, title, token }: HeaderProps) => {
         leave="transition ease-in duration-75 transform"
         leaveFrom="opacity-100 translate-y-0"
         leaveTo="opacity-0 -translate-y-full">
-        {(ref: any) => (
-          <div className="sm:hidden" id="mobile-menu">
-            <div ref={ref} className="w-full space-y-1 px-2 pb-3 pt-2">
-              <ActiveLink
-                pages={"dashboard"}
-                href={{ pathname: "/" }}
-                activeClassName=""
-                className="w-full lg:justify-center text-base lg:text-lg text-gray hover:text-white">
-                Dashboard
-              </ActiveLink>
+        <div className="sm:hidden" id="mobile-menu">
+          <div className="w-full space-y-1 px-2 pb-3 pt-2">
+            <ActiveLink
+              pages={"dashboard"}
+              href={{ pathname: "/" }}
+              activeClassName=""
+              className="w-full lg:justify-center text-base lg:text-lg text-gray hover:text-white">
+              Dashboard
+            </ActiveLink>
 
-              <ActiveLink
-                pages={"log-data"}
-                href={{ pathname: "/log-data" }}
-                activeClassName=""
-                className="w-full lg:justify-center text-base lg:text-lg text-gray hover:text-white">
-                Log Data
-              </ActiveLink>
+            <ActiveLink
+              pages={"log-data"}
+              href={{ pathname: "/log-data" }}
+              activeClassName=""
+              className="w-full lg:justify-center text-base lg:text-lg text-gray hover:text-white">
+              Log Data
+            </ActiveLink>
 
-              <ActiveLink
-                pages={"RFID"}
-                href={{ pathname: "/rfid" }}
-                activeClassName=""
-                className="w-full lg:justify-center text-base lg:text-lg text-gray hover:text-white">
-                RFID
-              </ActiveLink>
+            <ActiveLink
+              pages={"RFID"}
+              href={{ pathname: "/rfid" }}
+              activeClassName=""
+              className="w-full lg:justify-center text-base lg:text-lg text-gray hover:text-white">
+              RFID
+            </ActiveLink>
 
-              <ActiveLink
-                pages={"vehicle-type"}
-                href={{ pathname: "/vehicle-type" }}
-                activeClassName=""
-                className="w-full lg:justify-center text-base lg:text-lg text-gray hover:text-white">
-                Vehicle Type
-              </ActiveLink>
-            </div>
+            <ActiveLink
+              pages={"vehicle-type"}
+              href={{ pathname: "/vehicle-type" }}
+              activeClassName=""
+              className="w-full lg:justify-center text-base lg:text-lg text-gray hover:text-white">
+              Vehicle Type
+            </ActiveLink>
           </div>
-        )}
+        </div>
       </Transition>
 
       {/* <div
