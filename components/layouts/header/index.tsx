@@ -196,7 +196,7 @@ const Header = ({ header, userDefault, title, token }: HeaderProps) => {
                 classMenu="text-bodydark2 hover:bg-primary hover:text-white"
                 position="left"
               />
-              <DropdownNotification />
+              {/* <DropdownNotification /> */}
             </ul>
 
             {/* <!-- User Area --> */}

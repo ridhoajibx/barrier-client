@@ -103,7 +103,7 @@ export default function DropodownNotifications({
                               lastIndx !== index ? "border-b" : ""
                             } ${classMenu}`}>
                             {item?.icon && (
-                              <div className="flex h-8 w-8 shrink-0 items-center justify-center sm:h-10 sm:w-10">
+                              <div className="flex h-6 w-6 shrink-0 items-center justify-center sm:h-8 sm:w-8">
                                 <Icon
                                   className={
                                     item?.classIcon
