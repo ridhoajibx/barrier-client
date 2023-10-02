@@ -40,10 +40,10 @@ export default function DropodownNotifications({
         post = "left-1/2 -translate-x-1/2";
         break;
       case "left":
-        post = "-left-1/2 -translate-x-1/2";
+        post = "right-0 translate-x-5";
         break;
       case "right":
-        post = "-right-1/2 translate-x-1/2";
+        post = "left-0 -translate-x-5";
         break;
       default:
         return post;
@@ -100,10 +100,10 @@ export default function DropodownNotifications({
                             key={item?.name}
                             onClick={item?.href}
                             className={`text-sm tracking-wider text-left p-2 flex transition duration-150 ease-in-out focus:outline-none focus-visible:ring focus-visible:ring-primary focus-visible:ring-opacity-50 ${
-                              lastIndx !== index ? "border-b" : ""
+                              lastIndx !== index ? "border-b border-gray" : ""
                             } ${classMenu}`}>
                             {item?.icon && (
-                              <div className="flex h-6 w-6 shrink-0 items-center justify-center sm:h-8 sm:w-8">
+                              <div className="flex h-5 w-5 shrink-0 items-center justify-center sm:h-6 sm:w-6">
                                 <Icon
                                   className={
                                     item?.classIcon

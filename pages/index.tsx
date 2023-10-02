@@ -20,7 +20,7 @@ export default function Home() {
       token={""}
       header={"header"}
       title={"title"}>
-      <div className="w-full bg-gray p-6">
+      <div className="w-full p-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
           <div className="w-full lg:col-span-2">
             <button

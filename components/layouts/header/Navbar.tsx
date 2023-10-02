@@ -4,9 +4,16 @@
 // import DarkModeSwitcher from '../../DarkMode/DarkModeSwitcher'
 // import { MdMuseum } from 'react-icons/md'
 // import Icon from '../../Icon'
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import {
+  Dispatch,
+  Fragment,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import ActiveLink from "../link/ActiveLink";
-import { Transition } from "@headlessui/react";
+import { Dialog, Transition } from "@headlessui/react";
 
 type HeaderProps = {
   header?: string;
@@ -245,45 +252,66 @@ const Navbar = ({ header, userDefault, title, token }: HeaderProps) => {
         </div>
       </Transition>
 
-      {/* <div
-        className={`sm:hidden transform duration-300 ease-in-out ${
-          navbarOpen ? "" : "hidden"
-        }`}
-        id="mobile-menu">
-        <div className="space-y-1 px-2 pb-3 pt-2">
-          <ActiveLink
-            pages={"dashboard"}
-            href={{ pathname: "/" }}
-            activeClassName=""
-            className="w-full lg:justify-center text-base lg:text-lg text-gray hover:text-white">
-            Dashboard
-          </ActiveLink>
+      {/* <Transition as={Fragment} appear show={navbarOpen}>
+        <Dialog
+          as="div"
+          onClose={() => setNavbarOpen(!navbarOpen)}
+          className="fixed inset-0 z-[1000] overflow-y-auto">
+          <div
+            className="fixed w-full h-full bg-black/30"
+            aria-hidden="true"
+            onClick={() => setNavbarOpen(!navbarOpen)}
+          />
 
-          <ActiveLink
-            pages={"log-data"}
-            href={{ pathname: "/log-data" }}
-            activeClassName=""
-            className="w-full lg:justify-center text-base lg:text-lg text-gray hover:text-white">
-            Log Data
-          </ActiveLink>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-in-out duration-300"
+            enterFrom="opacity-0 scale-95"
+            enterTo="opacity-100 scale-100"
+            leave="ease-in-out duration-200"
+            leaveFrom="opacity-100 scale-95"
+            leaveTo="opacity-0 scale-100">
+            <div className="flex min-h-screen items-start">
+              <Dialog.Panel as="div" className={`bg-primary w-full relative`}>
+                <div className="w-full space-y-1 px-2 pb-3 pt-2">
+                  <ActiveLink
+                    pages={"dashboard"}
+                    href={{ pathname: "/" }}
+                    activeClassName=""
+                    className="w-full lg:justify-center text-base lg:text-lg text-gray hover:text-white">
+                    Dashboard
+                  </ActiveLink>
 
-          <ActiveLink
-            pages={"RFID"}
-            href={{ pathname: "/rfid" }}
-            activeClassName=""
-            className="w-full lg:justify-center text-base lg:text-lg text-gray hover:text-white">
-            RFID
-          </ActiveLink>
+                  <ActiveLink
+                    pages={"log-data"}
+                    href={{ pathname: "/log-data" }}
+                    activeClassName=""
+                    className="w-full lg:justify-center text-base lg:text-lg text-gray hover:text-white">
+                    Log Data
+                  </ActiveLink>
 
-          <ActiveLink
-            pages={"vehicle-type"}
-            href={{ pathname: "/vehicle-type" }}
-            activeClassName=""
-            className="w-full lg:justify-center text-base lg:text-lg text-gray hover:text-white">
-            Vehiccle Type
-          </ActiveLink>
-        </div>
-      </div> */}
+                  <ActiveLink
+                    pages={"RFID"}
+                    href={{ pathname: "/rfid" }}
+                    activeClassName=""
+                    className="w-full lg:justify-center text-base lg:text-lg text-gray hover:text-white">
+                    RFID
+                  </ActiveLink>
+
+                  <ActiveLink
+                    pages={"vehicle-type"}
+                    href={{ pathname: "/vehicle-type" }}
+                    activeClassName=""
+                    className="w-full lg:justify-center text-base lg:text-lg text-gray hover:text-white">
+                    Vehicle Type
+                  </ActiveLink>
+                </div>
+                <div className="" tabIndex={0}></div>
+              </Dialog.Panel>
+            </div>
+          </Transition.Child>
+        </Dialog>
+      </Transition> */}
     </nav>
   );
 };

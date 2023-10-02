@@ -40,10 +40,10 @@ export default function DropodownPopover({
         post = "left-1/2 -translate-x-1/2";
         break;
       case "left":
-        post = "-left-1/2 -translate-x-1/2";
+        post = "right-0 translate-x-5";
         break;
       case "right":
-        post = "-right-1/2 translate-x-1/2";
+        post = "left-0 -translate-x-5";
         break;
       default:
         return post;

@@ -40,7 +40,7 @@ const DashboardLayouts = ({
   ];
 
   return (
-    <div className="">
+    <div className="bg-white">
       <Head>
         <title>{`${header}`} | Barriergate</title>
         <link rel="icon" href={logo ? logo : `./image/logo-bar.png`} />
@@ -62,7 +62,7 @@ const DashboardLayouts = ({
 
           {/* <!-- ===== Main Content Start ===== --> */}
           {/* <div className='mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10'> */}
-          <main className="max-w-screen-2xl bg-white tracking-wide">
+          <main className="'mx-auto w-full h-full p-4 md:p-6 2xl:p-10">
             {children}
           </main>
           {/* <!-- ===== Main Content End ===== --> */}
