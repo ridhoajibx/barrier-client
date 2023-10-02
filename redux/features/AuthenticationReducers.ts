@@ -80,10 +80,10 @@ import {
   
   // Login
   export const webLogin = createAsyncThunk<any, AuthData, { state: RootState }>(
-    "auth/web/login",
+    "auth/login",
     async (params, { getState }) => {
       try {
-        const response = await axios.post("auth/web/login", params.data, config);
+        const response = await axios.post("auth/login", params.data, config);
         const { data, status } = response;
         if (status == 200) {
           toast.dark("Sign in successfully!");
@@ -95,7 +95,6 @@ import {
             secure: true,
             maxAge: 60 * 60 * 24,
           });
-          setCookie("access", data?.access, { secure: true });
           params.callback();
           return data;
         } else {
@@ -114,42 +113,6 @@ import {
     }
   );
   
-  // Login-google
-  export const webLoginGoogle = createAsyncThunk<
-    any,
-    AuthData,
-    { state: RootState }
-  >("auth/web/login/google", async (params, { getState }) => {
-    try {
-      const response = await axios.post(
-        "auth/web/login/google",
-        params.data,
-        config
-      );
-      const { data, status } = response;
-      console.log(data, "response :", params?.data);
-      if (status == 200) {
-        toast.dark("Sign in with Google successfully!");
-        setCookie("accessToken", data?.accessToken, { maxAge: 60 * 60 * 24 });
-        setCookie("refreshToken", data?.refreshToken, { maxAge: 60 * 60 * 24 });
-        setCookie("access", data?.access);
-        params.callback();
-        return data;
-      } else {
-        throw response;
-      }
-    } catch (error: any) {
-      const { data, status } = error.response;
-      let newError: any = { message: data.message[0] };
-      toast.dark(newError);
-      if (error.response && error.response.status === 404) {
-        throw new Error("User not found");
-      } else {
-        throw new Error(newError.message);
-      }
-    }
-  });
-  
   // Auth me
   export const getAuthMe = createAsyncThunk<any, MyData, { state: RootState }>(
     "auth/web/me",
@@ -162,7 +125,7 @@ import {
         },
       };
       try {
-        const response = await axios.get("auth/web/me", config);
+        const response = await axios.get("auth/me", config);
         const { data, status } = response;
         if (status == 200) {
           return data;
@@ -190,7 +153,7 @@ import {
   
   // logout
   export const webLogout = createAsyncThunk<any, AuthData, { state: RootState }>(
-    "auth/web/logout",
+    "auth/logout",
     async (params, { getState }) => {
       let config: HeadersConfiguration = {
         headers: {
@@ -200,12 +163,10 @@ import {
         },
       };
       try {
-        const response = await axios.get("auth/web/logout", config);
+        const response = await axios.get("auth/logout", config);
         const { data, status } = response;
         if (status == 200) {
-          toast.dark("Sign out successfully!");
-          deleteCookie("access");
-          deleteCookie("accessId");
+          toast.dark("Logout successfully!");
           deleteCookie("accessToken");
           deleteCookie("refreshToken");
           params.callback();
@@ -231,10 +192,10 @@ import {
     any,
     any,
     { state: RootState }
-  >("auth/web/forgot-password", async (params, { getState }) => {
+  >("auth/forgot-password", async (params, { getState }) => {
     try {
       const response = await axios.post(
-        "auth/web/forgotPassword",
+        "auth/forgotPassword",
         params.data,
         config
       );
@@ -259,12 +220,12 @@ import {
   
   // set new password - forgot password
   export const webNewPassword = createAsyncThunk<any, any, { state: RootState }>(
-    "auth/web/forgot-password/code",
+    "auth/forgot-password/code",
     async (params, { getState }) => {
       console.log(params, "params");
       try {
         const response = await axios.patch(
-          `auth/web/forgotPassword/${params.code}`,
+          `auth/forgotPassword/${params.code}`,
           params.data,
           config
         );

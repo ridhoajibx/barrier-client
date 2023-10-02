@@ -1,0 +1,7 @@
+/* start toastify */
+.Toastify__toast.Toastify__toast-theme--dark {
+    background-color: #0E5CBE !important;
+    color: white;
+    font-weight: 800;
+  }
+  /* end toastify */

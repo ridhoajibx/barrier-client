@@ -8,8 +8,9 @@ import { wrapper } from "../redux/store";
 import { ToastContainer } from "react-toastify";
 import { Provider } from "react-redux";
 import { useRouter } from "next/router";
+import { FC } from "react";
 
-export default function App({ Component, pageProps }: AppProps) {
+const MyApp: FC<AppProps> = ({ Component, ...pageProps }) => {
   const router = useRouter();
   const { pathname, query } = router;
   const { store, props } = wrapper.useWrappedStore(pageProps);
@@ -30,4 +31,6 @@ export default function App({ Component, pageProps }: AppProps) {
       <ToastContainer position="top-right" limit={500} />
     </Provider>
   );
-}
+};
+
+export default MyApp;

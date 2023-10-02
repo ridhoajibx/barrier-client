@@ -1,23 +1,33 @@
-import Image from "next/image";
 import { Inter } from "next/font/google";
 import DashboardLayouts from "@/components/layouts/DashboardLayouts";
 import { AreaCharts } from "@/components/chart/AreaChart";
 import {
   MdArrowDropDown,
-  MdCarRental,
   MdCardMembership,
-  MdExpandMore,
   MdOutlineDirectionsCarFilled,
   MdPeople,
 } from "react-icons/md";
+import { GetServerSideProps } from "next";
+import { getCookies } from "cookies-next";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
+interface PageProps {
+  page: string;
+  token: any;
+}
+
+type Props = {
+  pageProps: PageProps;
+};
+
+const Home = ({ pageProps }: Props) => {
+  const { token } = pageProps;
+
   return (
     <DashboardLayouts
       userDefault="/images/logo.png"
-      token={""}
+      token={token}
       header={"header"}
       title={"title"}>
       <div className="w-full p-6">
@@ -93,4 +103,31 @@ export default function Home() {
       </div>
     </DashboardLayouts>
   );
-}
+};
+
+export default Home;
+
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  res,
+  params,
+}) => {
+  // Parse cookies from the request headers
+  const cookies = getCookies({ req, res });
+
+  // Access cookies using the cookie name
+  const token = cookies["accessToken"] || null;
+
+  if (!token) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: true,
+      },
+    };
+  }
+
+  return {
+    props: { token },
+  };
+};

@@ -4,11 +4,9 @@
 // import DarkModeSwitcher from '../../DarkMode/DarkModeSwitcher'
 // import { MdMuseum } from 'react-icons/md'
 // import Icon from '../../Icon'
-import DropdownNotification from "@/components/dropdown/DropdownNotification";
-import DropdownUser from "@/components/dropdown/DropdownUser";
 import Image from "next/image";
 import Link from "next/link";
-import { Dispatch, Fragment, SetStateAction } from "react";
+import { Dispatch, Fragment, SetStateAction, useState } from "react";
 import Navbar from "./Navbar";
 import DropodownPopover from "@/components/dropdown/DropdownPopover";
 import {
@@ -21,8 +19,16 @@ import {
   MdPerson,
   MdSettings,
 } from "react-icons/md";
-import { FaSignOutAlt } from "react-icons/fa";
+import {
+  FaCircleNotch,
+  FaRegQuestionCircle,
+  FaSignOutAlt,
+} from "react-icons/fa";
 import DropodownNotifications from "@/components/dropdown/DropdownNotifications";
+import { useRouter } from "next/router";
+import Modal from "@/components/modal/Modal";
+import { useAppDispatch, useAppSelector } from "@/redux/Hooks";
+import { selectAuth, webLogout } from "@/redux/features/AuthenticationReducers";
 
 type HeaderProps = {
   header?: string;
@@ -32,28 +38,11 @@ type HeaderProps = {
   icons?: any;
 };
 
-const menuHeader = [
-  {
-    name: "Account Setting",
-    description: "",
-    href: () => {
-      console.log("click-3");
-    },
-    icon: MdManageAccounts,
-    classIcon: "",
-  },
-  {
-    name: "Sign Out",
-    description: "",
-    href: () => {
-      console.log("click-3");
-    },
-    icon: FaSignOutAlt,
-    classIcon: "",
-  },
-];
-
 const Header = ({ header, userDefault, title, token }: HeaderProps) => {
+  const dispatch = useAppDispatch();
+  const { pending } = useAppSelector(selectAuth);
+  const router = useRouter();
+  const [isSignOut, setIsSignOut] = useState<boolean>(false);
   const dataNotifications = [
     {
       name: "Nitification 1",
@@ -123,6 +112,49 @@ const Header = ({ header, userDefault, title, token }: HeaderProps) => {
         console.log("click-7");
       },
       icon: MdInfo,
+      classIcon: "",
+    },
+  ];
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const isOpenSignOut = () => {
+    setIsSignOut(true);
+  };
+
+  const isCloseSignOut = () => {
+    setIsSignOut(false);
+  };
+
+  const logout = () => {
+    dispatch(
+      webLogout({
+        data: {
+          token,
+        },
+        callback: () => {
+          router.push({ pathname: "/" });
+        },
+      })
+    );
+  };
+
+  const menuHeader = [
+    {
+      name: "Account Setting",
+      description: "",
+      href: () => {
+        console.log("click-3");
+      },
+      icon: MdManageAccounts,
+      classIcon: "",
+    },
+    {
+      name: "Sign Out",
+      description: "",
+      href: () => {
+        isOpenSignOut();
+      },
+      icon: FaSignOutAlt,
       classIcon: "",
     },
   ];
@@ -206,6 +238,37 @@ const Header = ({ header, userDefault, title, token }: HeaderProps) => {
       </header>
 
       <Navbar />
+
+      {/* signout */}
+      <Modal isOpen={isSignOut} onClose={isCloseSignOut} size="small">
+        <div className="w-full px-6 flex flex-col items-center justify-center min-h-full h-[350px] max-h-[650px] gap-4 text-graydark tracking-wider">
+          <h3 className="text-title-xl2 font-bold">Sign Out</h3>
+          <FaRegQuestionCircle className="w-20 h-20 text-primary" />
+          <p>Are you sure to Sign Out ?</p>
+          <div className="w-full flex items-center gap-2 justify-center">
+            <button
+              className="inline-flex bg-primary hover:opacity-90 rounded-lg px-3 py-2 text-sm text-white"
+              type="button"
+              onClick={logout}
+              disabled={loading || pending}>
+              {loading || pending ? (
+                <Fragment>
+                  Signing out ....
+                  <FaCircleNotch className="w-5 h-5 animate-spin-2" />
+                </Fragment>
+              ) : (
+                "Yes, Sign out!"
+              )}
+            </button>
+            <button
+              className="px-3 py-2 bg-danger rounded-lg hover:opacity-90 text-sm text-white"
+              type="button"
+              onClick={isCloseSignOut}>
+              No
+            </button>
+          </div>
+        </div>
+      </Modal>
     </Fragment>
   );
 };
