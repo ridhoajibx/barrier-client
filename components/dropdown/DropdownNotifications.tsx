@@ -86,47 +86,36 @@ export default function DropodownNotifications({
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-1">
               <Popover.Panel
-                className={`absolute z-10 mt-3 transform px-4 sm:px-0 w-screen max-w-xs ${positions}`}>
-                <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-                  <div className="relative grid bg-white h-90 overflow-y-auto overflow-x-hidden">
-                    <div className="top-0 sticky bg-white border-b-2 border-gray p-4 text-bodydark2">
-                      <h5 className="text-sm font-medium">Notification</h5>
-                    </div>
-                    {menus?.length > 0 &&
-                      menus?.map((item, index) => {
-                        const lastIndx = menus?.length - 1;
-                        return (
-                          <button
-                            key={item?.name}
-                            onClick={item?.href}
-                            className={`text-sm tracking-wider text-left p-2 flex transition duration-150 ease-in-out focus:outline-none focus-visible:ring focus-visible:ring-primary focus-visible:ring-opacity-50 ${
-                              lastIndx !== index ? "border-b border-gray" : ""
-                            } ${classMenu}`}>
-                            {item?.icon && (
-                              <div className="flex h-5 w-5 shrink-0 items-center justify-center sm:h-6 sm:w-6">
-                                <Icon
-                                  className={
-                                    item?.classIcon
-                                      ? item?.classIcon
-                                      : "w-5 h-5"
-                                  }
-                                  aria-hidden="true"
-                                  icon={item?.icon}
-                                />
-                              </div>
-                            )}
-
-                            <div className="ml-4">
-                              <p className="text-sm font-medium mb-2">
-                                {item.name}
-                              </p>
-                              <p className="text-xs">{item.description}</p>
-                            </div>
-                          </button>
-                        );
-                      })}
-                  </div>
+                className={`absolute mt-2.5 flex h-90 w-75 flex-col rounded-sm border border-stroke bg-white shadow-default right-0 sm:w-80 text-graydark`}>
+                <div className="px-4.5 py-3">
+                  <h5 className="text-sm font-medium text-bodydark2">
+                    Notification
+                  </h5>
                 </div>
+
+                {/* menu */}
+                <ul className="flex h-auto flex-col overflow-y-auto">
+                  {menus?.length > 0 &&
+                    menus?.map((item, index) => {
+                      const lastIndx = menus?.length - 1;
+                      return (
+                        <li key={index}>
+                          <button
+                            onClick={item?.href}
+                            className={`text-left flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 group ${classMenu}`}>
+                            <div className="text-sm">
+                              <p className="text-graydark group-hover:text-white">
+                                {item.name}
+                              </p>{" "}
+                              {item.description}
+                            </div>
+
+                            <p className="text-xs">24 Feb, 2025</p>
+                          </button>
+                        </li>
+                      );
+                    })}
+                </ul>
               </Popover.Panel>
             </Transition>
           </Fragment>
