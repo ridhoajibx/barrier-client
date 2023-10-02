@@ -9,8 +9,22 @@ import { SearchInput } from "@/components/forms/SearchInput";
 import DropdownSelect from "@/components/dropdown/DropdownSelect";
 import ReactDatePicker from "react-datepicker";
 import { MdOutlineCalendarToday } from "react-icons/md";
+import { useAppDispatch, useAppSelector } from "@/redux/Hooks";
+import { getAuthMe, selectAuth } from "@/redux/features/AuthenticationReducers";
+import { deleteCookie, getCookies } from "cookies-next";
+import { GetServerSideProps } from "next";
 
 const inter = Inter({ subsets: ["latin"] });
+
+interface PageProps {
+  page: string;
+  token: any;
+  refreshToken: any;
+}
+
+type Props = {
+  pageProps: PageProps;
+};
 
 interface RfidProps {
   rfid?: number | string | any;
@@ -155,7 +169,28 @@ const exData: RfidProps[] | any[] = [
   },
 ];
 
-export default function Rfid() {
+export default function Rfid({ pageProps }: Props) {
+  const { token, refreshToken } = pageProps;
+
+  const dispatch = useAppDispatch();
+  const { data, pending, error } = useAppSelector(selectAuth);
+
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+    dispatch(
+      getAuthMe({
+        token,
+        callback: () => {
+          deleteCookie("accessToken");
+          deleteCookie("refreshToken");
+          deleteCookie("roles");
+        },
+      })
+    );
+  }, [token]);
+
   const dateFormat = (value: any) => {
     let format: any = null;
     if (value) {
@@ -355,3 +390,29 @@ export default function Rfid() {
     </DashboardLayouts>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  res,
+  params,
+}) => {
+  // Parse cookies from the request headers
+  const cookies = getCookies({ req, res });
+
+  // Access cookies using the cookie name
+  const token = cookies["accessToken"] || null;
+  const refreshToken = cookies["refreshToken"] || null;
+
+  if (!token) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: true,
+      },
+    };
+  }
+
+  return {
+    props: { token, refreshToken },
+  };
+};

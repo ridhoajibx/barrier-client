@@ -8,13 +8,17 @@ import {
   MdPeople,
 } from "react-icons/md";
 import { GetServerSideProps } from "next";
-import { getCookies } from "cookies-next";
+import { deleteCookie, getCookies } from "cookies-next";
+import { useAppDispatch, useAppSelector } from "@/redux/Hooks";
+import { getAuthMe, selectAuth } from "@/redux/features/AuthenticationReducers";
+import { useEffect } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
 interface PageProps {
   page: string;
   token: any;
+  refreshToken: any;
 }
 
 type Props = {
@@ -22,7 +26,28 @@ type Props = {
 };
 
 const Home = ({ pageProps }: Props) => {
-  const { token } = pageProps;
+  const { token, refreshToken } = pageProps;
+
+  const dispatch = useAppDispatch();
+  const { data, pending, error } = useAppSelector(selectAuth);
+
+  console.log(data, "data-auth");
+
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+    dispatch(
+      getAuthMe({
+        token,
+        callback: () => {
+          deleteCookie("accessToken");
+          deleteCookie("refreshToken");
+          deleteCookie("roles");
+        },
+      })
+    );
+  }, [token]);
 
   return (
     <DashboardLayouts
@@ -117,6 +142,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   // Access cookies using the cookie name
   const token = cookies["accessToken"] || null;
+  const refreshToken = cookies["refreshToken"] || null;
 
   if (!token) {
     return {
@@ -128,6 +154,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   }
 
   return {
-    props: { token },
+    props: { token, refreshToken },
   };
 };

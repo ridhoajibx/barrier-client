@@ -115,7 +115,7 @@ import {
   
   // Auth me
   export const getAuthMe = createAsyncThunk<any, MyData, { state: RootState }>(
-    "auth/web/me",
+    "auth/me",
     async (params, { getState }) => {
       let config: HeadersConfiguration = {
         headers: {
@@ -128,6 +128,10 @@ import {
         const response = await axios.get("auth/me", config);
         const { data, status } = response;
         if (status == 200) {
+          setCookie("roles", data?.role, {
+            secure: true,
+            maxAge: 60 * 60 * 24,
+          });
           return data;
         } else {
           throw response;
@@ -140,7 +144,7 @@ import {
           throw new Error("User not found");
         } else {
           if (status == 401) {
-            deleteCookie("access");
+            deleteCookie("role");
             deleteCookie("accessToken");
             deleteCookie("refreshToken");
             params.callback();
@@ -169,6 +173,7 @@ import {
           toast.dark("Logout successfully!");
           deleteCookie("accessToken");
           deleteCookie("refreshToken");
+          deleteCookie("roles");
           params.callback();
           return data;
         } else {
@@ -342,8 +347,8 @@ import {
             error: false,
             data: {
               ...state.data,
-              user: payload.user,
-              unit: payload.unit,
+              user: payload,
+              roles: payload?.role,
             },
           };
         })
