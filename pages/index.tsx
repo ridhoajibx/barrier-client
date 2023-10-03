@@ -318,7 +318,7 @@ const Home = ({ pageProps }: Props) => {
     <DashboardLayouts
       userDefault="/images/logo.png"
       token={token}
-      refeshToken={refreshToken}
+      refreshToken={refreshToken}
       header={"header"}
       title={"title"}>
       <div className="relative w-full bg-gray overflow-auto">

@@ -447,6 +447,7 @@ export default function VehicleType({ pageProps }: Props) {
       userDefault="/images/logo.png"
       logo="/images/logo.png"
       token={token}
+      refreshToken={refreshToken}
       header={"Vehicle Type"}
       title={"type"}>
       <div className="w-full bg-white h-full overflow-auto relative">

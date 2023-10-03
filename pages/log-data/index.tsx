@@ -293,6 +293,7 @@ export default function LogDataPage({ pageProps }: Props) {
       userDefault="/images/logo.png"
       logo="/images/logo.png"
       token={token}
+      refreshToken={refreshToken}
       header={"Log Data"}
       title={"type"}>
       <div className="w-full bg-white h-full overflow-auto relative">
