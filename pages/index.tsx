@@ -319,7 +319,7 @@ const Home = ({ pageProps }: Props) => {
       token={token}
       header={"header"}
       title={"title"}>
-      <div className="w-full bg-gray p-4 md:p-6 2xl:p-10">
+      <div className="w-full bg-gray p-4 overflow-auto md:p-6 2xl:p-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
           <div className="w-full lg:col-span-2">
             <div className="w-full mb-3">

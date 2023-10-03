@@ -1,18 +1,37 @@
 import Image from "next/image";
 import { Inter } from "next/font/google";
 import DashboardLayouts from "@/components/layouts/DashboardLayouts";
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import SelectTables from "@/components/tables/layouts";
 import { ColumnDef } from "@tanstack/react-table";
 import moment from "moment";
 import { SearchInput } from "@/components/forms/SearchInput";
 import DropdownSelect from "@/components/dropdown/DropdownSelect";
 import ReactDatePicker from "react-datepicker";
-import { MdOutlineCalendarToday } from "react-icons/md";
+import {
+  MdAdd,
+  MdDelete,
+  MdEdit,
+  MdOutlineCalendarToday,
+} from "react-icons/md";
 import { GetServerSideProps } from "next";
 import { deleteCookie, getCookies } from "cookies-next";
 import { useAppDispatch, useAppSelector } from "@/redux/Hooks";
 import { getAuthMe, selectAuth } from "@/redux/features/AuthenticationReducers";
+import {
+  deleteVehicleType,
+  getVehicleTypes,
+  selectVehicleTypeManagement,
+} from "@/redux/features/vehicleType/vehicleTypeReducers";
+import { VehicleTypeProps } from "@/utils/propTypes";
+import Button from "@/components/button/Button";
+import { useRouter } from "next/router";
+import { RequestQueryBuilder } from "@nestjsx/crud-request";
+import Modal from "@/components/modal/Modal";
+import { ModalHeader } from "@/components/modal/ModalComponent";
+import FormVehicle from "@/components/forms/vehicle-type/FormVehicle";
+import { FaCircleNotch } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -170,10 +189,15 @@ const exData: VehicleProps[] | any[] = [
 ];
 
 export default function VehicleType({ pageProps }: Props) {
+  const router = useRouter();
+  const { query, pathname } = router;
   const { token, refreshToken } = pageProps;
 
   const dispatch = useAppDispatch();
-  const { data, pending, error } = useAppSelector(selectAuth);
+  const { data, error } = useAppSelector(selectAuth);
+
+  // data vehicle-type
+  const { vehicleTypes, pending } = useAppSelector(selectVehicleTypeManagement);
 
   useEffect(() => {
     if (!token) {
@@ -223,11 +247,131 @@ export default function VehicleType({ pageProps }: Props) {
   const [dateRange, setDateRange] = useState<Date[]>([start, end]);
   const [startDate, endDate] = dateRange;
 
-  const columns = useMemo<ColumnDef<VehicleProps, any>[]>(
+  // modal
+  const [isForm, setIsForm] = useState<any>(null);
+  const [isCreate, setIsCreate] = useState<boolean>(false);
+  const [isUpdate, setIsUpdate] = useState<boolean>(false);
+  const [isDelete, setIsDelete] = useState<boolean>(false);
+
+  const isOpenCreate = () => {
+    setIsCreate(true);
+  };
+
+  const isCloseCreate = () => {
+    setIsForm(null);
+    setIsCreate(false);
+  };
+
+  const isOpenUpdate = (value: any) => {
+    setIsForm(value);
+    setIsUpdate(true);
+  };
+
+  const isCloseUpdate = () => {
+    setIsForm(null);
+    setIsUpdate(false);
+  };
+
+  const isOpenDelete = (value: any) => {
+    setIsForm(value);
+    setIsDelete(true);
+  };
+
+  const isCloseDelete = () => {
+    setIsForm(null);
+    setIsDelete(false);
+  };
+
+  // data-table
+  useEffect(() => {
+    if (query?.page) setPages(Number(query?.page) || 1);
+    if (query?.limit) setLimit(Number(query?.limit) || 10);
+    if (query?.search) setSearch((query?.search as any) || "");
+    if (query?.sort) {
+      if (query?.sort == "ASC") {
+        setSort({ value: query?.sort, label: "A-Z" });
+      } else {
+        setSort({ value: query?.sort, label: "Z-A" });
+      }
+    }
+  }, [query?.page, query?.limit, query?.search, query?.sort]);
+
+  useEffect(() => {
+    let qr: any = {
+      page: pages,
+      limit: limit,
+    };
+
+    if (search) qr = { ...qr, search: search };
+    if (sort) qr = { ...qr, sort: sort?.value };
+
+    router.replace({ pathname, query: qr });
+  }, [pages, limit, search, sort]);
+
+  const filters = useMemo(() => {
+    const qb = RequestQueryBuilder.create();
+
+    const search = {
+      $and: [
+        {
+          $or: [
+            { vehicleTypeCode: { $contL: query?.search } },
+            { vehicleTypeName: { $contL: query?.search } },
+          ],
+        },
+      ],
+    };
+
+    if (query?.page) qb.setPage(Number(query?.page) || 1);
+    if (query?.limit) qb.setLimit(Number(query?.limit) || 10);
+
+    qb.search(search);
+    if (!query?.sort) {
+      qb.sortBy({
+        field: `updatedAt`,
+        order: "DESC",
+      });
+    } else {
+      qb.sortBy({
+        field: `vehicleTypeName`,
+        order: !sort?.value ? "ASC" : sort.value,
+      });
+    }
+    qb.query();
+    return qb;
+  }, [query?.page, query?.limit, query?.search, query?.sort]);
+
+  useEffect(() => {
+    if (token) {
+      dispatch(getVehicleTypes({ token, params: filters?.queryObject }));
+    }
+  }, [token, filters]);
+
+  console.log("data-table :", vehicleTypes?.data);
+
+  useEffect(() => {
+    const newArr: VehicleTypeProps[] | any[] = [];
+    let newPageCount: number | any = 0;
+    let newTotal: number | any = 0;
+    const { data, pageCount, total } = vehicleTypes;
+    if (data && data?.length > 0) {
+      data?.map((item: any) => {
+        newArr.push(item);
+      });
+      newPageCount = pageCount;
+      newTotal = total;
+    }
+    setDataTable(newArr);
+    setPageCount(newPageCount);
+    setTotal(newTotal);
+  }, [vehicleTypes]);
+
+  // column-table
+  const columns = useMemo<ColumnDef<VehicleTypeProps, any>[]>(
     () => [
       {
-        accessorKey: "rfid",
-        header: (info) => <div className="uppercase">RFID</div>,
+        accessorKey: "vehicleTypeCode",
+        header: (info) => <div className="uppercase">Vehicle Code</div>,
         cell: ({ getValue, row }) => {
           return <div>{getValue()}</div>;
         },
@@ -235,41 +379,7 @@ export default function VehicleType({ pageProps }: Props) {
         enableColumnFilter: false,
       },
       {
-        accessorKey: "fullName",
-        cell: ({ row, getValue }) => {
-          return <div>{getValue()}</div>;
-        },
-        header: (props) => (
-          <div className="w-full text-left uppercase">User</div>
-        ),
-        footer: (props) => props.column.id,
-        enableColumnFilter: false,
-        size: 150,
-      },
-      {
-        accessorKey: "arrival",
-        cell: ({ row, getValue }) => {
-          return <div>{!getValue() ? "" : dateFormat(getValue())}</div>;
-        },
-        header: (props) => (
-          <div className="w-full text-left uppercase">Arrival Date</div>
-        ),
-        footer: (props) => props.column.id,
-        enableColumnFilter: false,
-      },
-      {
-        accessorKey: "departure",
-        cell: ({ row, getValue }) => {
-          return <div>{!getValue() ? "" : dateFormat(getValue())}</div>;
-        },
-        header: (props) => (
-          <div className="w-full text-left uppercase">Departure Date</div>
-        ),
-        footer: (props) => props.column.id,
-        enableColumnFilter: false,
-      },
-      {
-        accessorKey: "vehiclesNumber",
+        accessorKey: "vehicleTypeName",
         cell: ({ row, getValue }) => {
           return <div>{getValue()}</div>;
         },
@@ -279,13 +389,57 @@ export default function VehicleType({ pageProps }: Props) {
         footer: (props) => props.column.id,
         enableColumnFilter: false,
       },
+      {
+        accessorKey: "id",
+        cell: ({ row, getValue }) => {
+          return (
+            <div className="w-full flex items-center justify-center gap-2">
+              <button
+                type="button"
+                className="flex items-center gap-1 p-2 rounded-md border border-gray-5 hover:bg-gray active:scale-90"
+                onClick={() => isOpenUpdate(row?.original)}>
+                <span>
+                  <MdEdit className="w-4 h-4" />
+                </span>
+              </button>
+
+              <button
+                type="button"
+                className="flex items-center gap-1 p-2 rounded-md border text-white border-danger bg-danger hover:opacity-70 active:scale-90"
+                onClick={() => isOpenDelete(row?.original)}>
+                <span>
+                  <MdDelete className="w-4 h-4" />
+                </span>
+              </button>
+            </div>
+          );
+        },
+        header: (props) => (
+          <div className="w-full text-center uppercase">Actions</div>
+        ),
+        footer: (props) => props.column.id,
+        enableColumnFilter: false,
+      },
     ],
     []
   );
 
-  useEffect(() => {
-    setDataTable(exData);
-  }, [exData]);
+  const onDeleteVehicle = (value: any) => {
+    console.log(value, "delete");
+    if (value?.id) {
+      dispatch(
+        deleteVehicleType({
+          token,
+          id: value?.id,
+          isSuccess: () => {
+            dispatch(getVehicleTypes({ token, params: filters.queryObject }));
+            toast.dark("Delete vehicle type is successfull");
+            isCloseDelete();
+          },
+        })
+      );
+    }
+  };
 
   return (
     <DashboardLayouts
@@ -294,9 +448,9 @@ export default function VehicleType({ pageProps }: Props) {
       token={""}
       header={"Vehicle Type"}
       title={"type"}>
-      <div className="w-full p-0 lg:p-4 relative">
+      <div className="w-full bg-white h-full overflow-auto p-0 lg:p-4 relative">
         <div className="w-full grid grid-cols-1 lg:grid-cols-5 gap-2.5 p-4">
-          <div className="w-full lg:col-span-2">
+          <div className="w-full lg:col-span-3">
             <SearchInput
               className="w-full text-sm rounded-xl"
               classNamePrefix=""
@@ -320,54 +474,20 @@ export default function VehicleType({ pageProps }: Props) {
               placeholder="Sorts..."
               options={sortOpt}
               icon="MdSort"
+              isClearable
             />
           </div>
 
-          <div className="w-full flex flex-col lg:flex-row items-center gap-2">
-            <div className="w-full">
-              <label className="w-full text-gray-5 overflow-hidden">
-                <div className="relative">
-                  <ReactDatePicker
-                    selectsRange={true}
-                    startDate={startDate}
-                    endDate={endDate}
-                    onChange={(update: any) => {
-                      setDateRange(update);
-                    }}
-                    isClearable={false}
-                    placeholderText={"Select date"}
-                    todayButton
-                    dropdownMode="select"
-                    peekNextMonth
-                    showMonthDropdown
-                    showYearDropdown
-                    disabled={false}
-                    clearButtonClassName="after:w-10 after:h-10 h-10 w-10"
-                    className="text-sm lg:text-md w-full text-gray-5 rounded-lg border border-stroke bg-transparent py-4 pl-12 pr-6 outline-none focus:border-primary focus-visible:shadow-none "
-                  />
-                  <MdOutlineCalendarToday className="absolute left-4 top-4 h-6 w-6 text-gray-5" />
-                </div>
-              </label>
-            </div>
-          </div>
-
-          <div className="w-full flex flex-col lg:flex-row items-center gap-2">
-            <DropdownSelect
-              customStyles={stylesSelect}
-              value={types}
-              onChange={setTypes}
-              error=""
-              className="text-sm font-normal text-gray-5 w-full lg:w-2/10"
-              classNamePrefix=""
-              formatOptionLabel=""
-              instanceId="1"
-              isDisabled={false}
-              isMulti={false}
-              placeholder="All Type..."
-              options={typesOpt}
-              icon=""
-            />
-          </div>
+          <Button
+            type="button"
+            variant="primary"
+            className="rounded-lg hover:opacity-70 active:scale-90"
+            onClick={isOpenCreate}>
+            <span className="tex-sm">New Vehicle</span>
+            <MdAdd className="w-4 h-4" />
+          </Button>
+          {/* <div className="w-full flex flex-col lg:flex-row items-center gap-2">
+          </div> */}
         </div>
 
         <div className="w-full">
@@ -387,6 +507,73 @@ export default function VehicleType({ pageProps }: Props) {
           />
         </div>
       </div>
+
+      {/* create vehicle type */}
+      <Modal isOpen={isCreate} onClose={isCloseCreate} size="small">
+        <FormVehicle
+          token={token}
+          items={isForm}
+          isClose={isCloseCreate}
+          refreshData={() =>
+            dispatch(getVehicleTypes({ token, params: filters.queryObject }))
+          }
+        />
+      </Modal>
+
+      {/* create vehicle type */}
+      <Modal isOpen={isUpdate} onClose={isCloseUpdate} size="small">
+        <FormVehicle
+          token={token}
+          items={isForm}
+          isClose={isCloseUpdate}
+          refreshData={() =>
+            dispatch(getVehicleTypes({ token, params: filters.queryObject }))
+          }
+          isUpdate
+        />
+      </Modal>
+
+      {/* delete vehicle */}
+      <Modal size="small" onClose={isCloseDelete} isOpen={isDelete}>
+        <Fragment>
+          <ModalHeader
+            className="p-4 border-b-2 border-gray mb-3"
+            isClose={true}
+            onClick={isCloseDelete}>
+            <div className="flex flex-col gap-1">
+              <h3 className="text-lg font-semibold">Delete Vehicle Type</h3>
+              <p className="text-gray-5">{`Are you sure to delete ${
+                isForm?.vehicleTypeName || ""
+              } ?`}</p>
+            </div>
+          </ModalHeader>
+          <div className="w-full flex items-center px-4 justify-end gap-2 mb-3">
+            <Button
+              type="button"
+              variant="secondary-outline"
+              className="rounded-lg border-2 border-gray-2 shadow-2 active:scale-90"
+              onClick={isCloseDelete}>
+              <span className="text-xs font-semibold">Discard</span>
+            </Button>
+
+            <Button
+              type="button"
+              variant="primary"
+              className="rounded-lg border-2 border-primary active:scale-90"
+              onClick={() => onDeleteVehicle(isForm)}
+              disabled={pending}>
+              {pending ? (
+                <Fragment>
+                  <span className="text-xs">Deleting...</span>
+                  <FaCircleNotch className="w-4 h-4 animate-spin-1.5" />
+                </Fragment>
+              ) : (
+                <span className="text-xs">Yes, Delete it!</span>
+              )}
+            </Button>
+          </div>
+        </Fragment>
+      </Modal>
     </DashboardLayouts>
   );
 }

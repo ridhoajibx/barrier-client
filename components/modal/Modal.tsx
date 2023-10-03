@@ -15,6 +15,7 @@ const Modal = ({ isOpen, onClose, children, size }: Props) => {
     if (size === "large") setSizes("max-w-5xl");
     else if (size === "medium") setSizes("max-w-2xl");
     else if (size === "small") setSizes("max-w-sm");
+    else if (size === "full") setSizes("h-full min-h-screen rounded-none");
     else setSizes("max-w-2xl");
   }, [size]);
   return (
