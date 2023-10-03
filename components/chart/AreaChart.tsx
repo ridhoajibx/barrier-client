@@ -24,7 +24,7 @@ ChartJS.register(
   Legend
 );
 
-export const options = {
+export const customOptions = {
   responsive: true,
   plugins: {
     legend: {
@@ -42,7 +42,7 @@ export const options = {
 
 const labels = ["January", "February", "March", "April", "May", "June", "July"];
 
-export const data = {
+export const customData = {
   labels,
   datasets: [
     {
@@ -64,6 +64,29 @@ export const data = {
   ],
 };
 
-export function AreaCharts() {
-  return <Line options={options} data={data} />;
-}
+type AreaProps = {
+  data?: {
+    labels: any;
+    datasets: any;
+  };
+  options?: any;
+  width?: string;
+  height?: string;
+  className?: string;
+};
+
+const AreaChart = ({ data, options, width, height, className }: AreaProps) => {
+  return (
+    <div className="w-full flex items-center gap-2 overflow-x-hidden overflow-y-auto">
+      <Line
+        data={data ? data : customData}
+        height={height}
+        width={width}
+        options={options ? options : customOptions}
+        className={className}
+      />
+    </div>
+  );
+};
+
+export default AreaChart;
