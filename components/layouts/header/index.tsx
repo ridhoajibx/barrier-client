@@ -6,7 +6,14 @@
 // import Icon from '../../Icon'
 import Image from "next/image";
 import Link from "next/link";
-import { Dispatch, Fragment, SetStateAction, useState } from "react";
+import {
+  Dispatch,
+  Fragment,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import Navbar from "./Navbar";
 import DropodownPopover from "@/components/dropdown/DropdownPopover";
 import {
@@ -28,19 +35,33 @@ import DropodownNotifications from "@/components/dropdown/DropdownNotifications"
 import { useRouter } from "next/router";
 import Modal from "@/components/modal/Modal";
 import { useAppDispatch, useAppSelector } from "@/redux/Hooks";
-import { selectAuth, webLogout } from "@/redux/features/AuthenticationReducers";
+import {
+  selectAuth,
+  webLogout,
+  webRefresh,
+} from "@/redux/features/AuthenticationReducers";
+import { toast } from "react-toastify";
+import { deleteCookie } from "cookies-next";
 
 type HeaderProps = {
   header?: string;
   userDefault?: string;
   title?: any;
   token?: any;
+  refreshToken?: any;
   icons?: any;
 };
 
-const Header = ({ header, userDefault, title, token }: HeaderProps) => {
+const Header = ({
+  header,
+  userDefault,
+  title,
+  token,
+  refreshToken,
+}: HeaderProps) => {
+  const url = process.env.API_ENDPOINT;
   const dispatch = useAppDispatch();
-  const { pending } = useAppSelector(selectAuth);
+  const { data, pending, error, message } = useAppSelector(selectAuth);
   const router = useRouter();
   const [isSignOut, setIsSignOut] = useState<boolean>(false);
   const dataNotifications = [
@@ -128,15 +149,21 @@ const Header = ({ header, userDefault, title, token }: HeaderProps) => {
   const logout = () => {
     dispatch(
       webLogout({
-        data: {
-          token,
-        },
+        token,
         callback: () => {
           router.push({ pathname: "/" });
         },
       })
     );
   };
+
+  const users = useMemo(() => {
+    let newObj: any = null;
+    if (data?.user) {
+      newObj = data?.user;
+    }
+    return newObj;
+  }, [data]);
 
   const menuHeader = [
     {
@@ -158,6 +185,27 @@ const Header = ({ header, userDefault, title, token }: HeaderProps) => {
       classIcon: "",
     },
   ];
+
+  useEffect(() => {
+    let filter = error && message == "jwt expired";
+    let unauthorized = message == "Unauthorized";
+    if (filter) {
+      dispatch(
+        webRefresh({
+          token: refreshToken,
+          callback: () => {
+            toast.dark("Login access has been refresh");
+          },
+        })
+      );
+    } else if (unauthorized) {
+      deleteCookie("accessToken");
+      deleteCookie("refreshToken");
+      deleteCookie("roles");
+    }
+  }, [refreshToken, error, message]);
+
+  console.log({ error, message }, "error-auth");
 
   return (
     <Fragment>
@@ -191,7 +239,11 @@ const Header = ({ header, userDefault, title, token }: HeaderProps) => {
               <div className="flex items-center gap-2">
                 <span className="h-12 w-12 rounded-full flex items-center border">
                   <Image
-                    src="/images/logo.png"
+                    src={
+                      users?.profileImage
+                        ? `${url}user/profileImage/${users?.profileImage}`
+                        : "/images/logo.png"
+                    }
                     alt="avatar"
                     width={80}
                     height={80}
@@ -200,8 +252,10 @@ const Header = ({ header, userDefault, title, token }: HeaderProps) => {
                 </span>
 
                 <div className="hidden text-left lg:block text-gray-6">
-                  <span className="block text-sm font-medium">John Doe</span>
-                  <span className="block text-xs">UX Designer</span>
+                  <span className="block text-sm font-medium">
+                    {users?.fullName || "-"}
+                  </span>
+                  <span className="block text-xs">{users?.role || "-"}</span>
                 </div>
               </div>
               {/* <!-- Notification Menu Area --> */}
@@ -236,8 +290,6 @@ const Header = ({ header, userDefault, title, token }: HeaderProps) => {
           </div>
         </div>
       </header>
-
-      <Navbar />
 
       {/* signout */}
       <Modal isOpen={isSignOut} onClose={isCloseSignOut} size="small">

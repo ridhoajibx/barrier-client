@@ -13,6 +13,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/Hooks";
 import { getAuthMe, selectAuth } from "@/redux/features/AuthenticationReducers";
 import { deleteCookie, getCookies } from "cookies-next";
 import { GetServerSideProps } from "next";
+import Navbar from "@/components/layouts/header/Navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -291,100 +292,103 @@ export default function LogDataPage({ pageProps }: Props) {
     <DashboardLayouts
       userDefault="/images/logo.png"
       logo="/images/logo.png"
-      token={""}
+      token={token}
       header={"Log Data"}
       title={"type"}>
-      <div className="w-full p-0 lg:p-4 relative">
-        <div className="w-full grid grid-cols-1 lg:grid-cols-5 gap-2.5 p-4">
-          <div className="w-full lg:col-span-2">
-            <SearchInput
-              className="w-full text-sm rounded-xl"
-              classNamePrefix=""
-              filter={search}
-              setFilter={setSearch}
-              placeholder="Search..."
-            />
-          </div>
-          <div className="w-full flex flex-col lg:flex-row items-center gap-2">
-            <DropdownSelect
-              customStyles={stylesSelectSort}
-              value={sort}
-              onChange={setSort}
-              error=""
-              className="text-sm font-normal text-gray-5 w-full lg:w-2/10"
-              classNamePrefix=""
-              formatOptionLabel=""
-              instanceId="1"
-              isDisabled={false}
-              isMulti={false}
-              placeholder="Sorts..."
-              options={sortOpt}
-              icon="MdSort"
-            />
-          </div>
+      <div className="w-full bg-white h-full overflow-auto relative">
+        <Navbar />
+        <div className="w-full md:p-6 2xl:p-10">
+          <div className="w-full grid grid-cols-1 lg:grid-cols-5 gap-2.5 p-4">
+            <div className="w-full lg:col-span-2">
+              <SearchInput
+                className="w-full text-sm rounded-xl"
+                classNamePrefix=""
+                filter={search}
+                setFilter={setSearch}
+                placeholder="Search..."
+              />
+            </div>
+            <div className="w-full flex flex-col lg:flex-row items-center gap-2">
+              <DropdownSelect
+                customStyles={stylesSelectSort}
+                value={sort}
+                onChange={setSort}
+                error=""
+                className="text-sm font-normal text-gray-5 w-full lg:w-2/10"
+                classNamePrefix=""
+                formatOptionLabel=""
+                instanceId="1"
+                isDisabled={false}
+                isMulti={false}
+                placeholder="Sorts..."
+                options={sortOpt}
+                icon="MdSort"
+              />
+            </div>
 
-          <div className="w-full flex flex-col lg:flex-row items-center gap-2">
-            <div className="w-full">
-              <label className="w-full text-gray-5 overflow-hidden">
-                <div className="relative">
-                  <ReactDatePicker
-                    selectsRange={true}
-                    startDate={startDate}
-                    endDate={endDate}
-                    onChange={(update: any) => {
-                      setDateRange(update);
-                    }}
-                    isClearable={false}
-                    placeholderText={"Select date"}
-                    todayButton
-                    dropdownMode="select"
-                    peekNextMonth
-                    showMonthDropdown
-                    showYearDropdown
-                    disabled={false}
-                    clearButtonClassName="after:w-10 after:h-10 h-10 w-10"
-                    className="text-sm lg:text-md w-full text-gray-5 rounded-lg border border-stroke bg-transparent py-4 pl-12 pr-6 outline-none focus:border-primary focus-visible:shadow-none "
-                  />
-                  <MdOutlineCalendarToday className="absolute left-4 top-4 h-6 w-6 text-gray-5" />
-                </div>
-              </label>
+            <div className="w-full flex flex-col lg:flex-row items-center gap-2">
+              <div className="w-full">
+                <label className="w-full text-gray-5 overflow-hidden">
+                  <div className="relative">
+                    <ReactDatePicker
+                      selectsRange={true}
+                      startDate={startDate}
+                      endDate={endDate}
+                      onChange={(update: any) => {
+                        setDateRange(update);
+                      }}
+                      isClearable={false}
+                      placeholderText={"Select date"}
+                      todayButton
+                      dropdownMode="select"
+                      peekNextMonth
+                      showMonthDropdown
+                      showYearDropdown
+                      disabled={false}
+                      clearButtonClassName="after:w-10 after:h-10 h-10 w-10"
+                      className="text-sm lg:text-md w-full text-gray-5 rounded-lg border border-stroke bg-transparent py-4 pl-12 pr-6 outline-none focus:border-primary focus-visible:shadow-none "
+                    />
+                    <MdOutlineCalendarToday className="absolute left-4 top-4 h-6 w-6 text-gray-5" />
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div className="w-full flex flex-col lg:flex-row items-center gap-2">
+              <DropdownSelect
+                customStyles={stylesSelect}
+                value={types}
+                onChange={setTypes}
+                error=""
+                className="text-sm font-normal text-gray-5 w-full lg:w-2/10"
+                classNamePrefix=""
+                formatOptionLabel=""
+                instanceId="1"
+                isDisabled={false}
+                isMulti={false}
+                placeholder="All Type..."
+                options={typesOpt}
+                icon=""
+              />
             </div>
           </div>
 
-          <div className="w-full flex flex-col lg:flex-row items-center gap-2">
-            <DropdownSelect
-              customStyles={stylesSelect}
-              value={types}
-              onChange={setTypes}
-              error=""
-              className="text-sm font-normal text-gray-5 w-full lg:w-2/10"
-              classNamePrefix=""
-              formatOptionLabel=""
-              instanceId="1"
-              isDisabled={false}
-              isMulti={false}
-              placeholder="All Type..."
-              options={typesOpt}
-              icon=""
+          <div className="w-full">
+            <SelectTables
+              loading={loading}
+              setLoading={setLoading}
+              pages={pages}
+              setPages={setPages}
+              limit={limit}
+              setLimit={setLimit}
+              pageCount={pageCount}
+              columns={columns}
+              dataTable={dataTable}
+              total={total}
+              setIsSelected={setIsSelected}
+              classTable=""
             />
           </div>
-        </div>
-
-        <div className="w-full">
-          <SelectTables
-            loading={loading}
-            setLoading={setLoading}
-            pages={pages}
-            setPages={setPages}
-            limit={limit}
-            setLimit={setLimit}
-            pageCount={pageCount}
-            columns={columns}
-            dataTable={dataTable}
-            total={total}
-            setIsSelected={setIsSelected}
-            classTable=""
-          />
         </div>
       </div>
     </DashboardLayouts>

@@ -13,6 +13,7 @@ type Props = {
   images?: string;
   userDefault?: string;
   token?: any;
+  refreshToken?: any;
   icons?: any;
 };
 
@@ -23,6 +24,7 @@ const DashboardLayouts = ({
   header,
   userDefault,
   token,
+  refreshToken,
   icons,
 }: Props) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -55,6 +57,7 @@ const DashboardLayouts = ({
             header={header}
             userDefault={userDefault}
             token={token}
+            refreshToken={refreshToken}
             icons={icons}
           />
 

@@ -32,6 +32,7 @@ import { ModalHeader } from "@/components/modal/ModalComponent";
 import FormVehicle from "@/components/forms/vehicle-type/FormVehicle";
 import { FaCircleNotch } from "react-icons/fa";
 import { toast } from "react-toastify";
+import Navbar from "@/components/layouts/header/Navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -445,66 +446,69 @@ export default function VehicleType({ pageProps }: Props) {
     <DashboardLayouts
       userDefault="/images/logo.png"
       logo="/images/logo.png"
-      token={""}
+      token={token}
       header={"Vehicle Type"}
       title={"type"}>
-      <div className="w-full bg-white h-full overflow-auto p-0 lg:p-4 relative">
-        <div className="w-full grid grid-cols-1 lg:grid-cols-5 gap-2.5 p-4">
-          <div className="w-full lg:col-span-3">
-            <SearchInput
-              className="w-full text-sm rounded-xl"
-              classNamePrefix=""
-              filter={search}
-              setFilter={setSearch}
-              placeholder="Search..."
-            />
-          </div>
-          <div className="w-full flex flex-col lg:flex-row items-center gap-2">
-            <DropdownSelect
-              customStyles={stylesSelectSort}
-              value={sort}
-              onChange={setSort}
-              error=""
-              className="text-sm font-normal text-gray-5 w-full lg:w-2/10"
-              classNamePrefix=""
-              formatOptionLabel=""
-              instanceId="1"
-              isDisabled={false}
-              isMulti={false}
-              placeholder="Sorts..."
-              options={sortOpt}
-              icon="MdSort"
-              isClearable
-            />
-          </div>
+      <div className="w-full bg-white h-full overflow-auto relative">
+        <Navbar />
+        <div className="w-full md:p-6 2xl:p-10">
+          <div className="w-full grid grid-cols-1 lg:grid-cols-5 gap-2.5 p-4">
+            <div className="w-full lg:col-span-3">
+              <SearchInput
+                className="w-full text-sm rounded-xl"
+                classNamePrefix=""
+                filter={search}
+                setFilter={setSearch}
+                placeholder="Search..."
+              />
+            </div>
+            <div className="w-full flex flex-col lg:flex-row items-center gap-2">
+              <DropdownSelect
+                customStyles={stylesSelectSort}
+                value={sort}
+                onChange={setSort}
+                error=""
+                className="text-sm font-normal text-gray-5 w-full lg:w-2/10"
+                classNamePrefix=""
+                formatOptionLabel=""
+                instanceId="1"
+                isDisabled={false}
+                isMulti={false}
+                placeholder="Sorts..."
+                options={sortOpt}
+                icon="MdSort"
+                isClearable
+              />
+            </div>
 
-          <Button
-            type="button"
-            variant="primary"
-            className="rounded-lg hover:opacity-70 active:scale-90"
-            onClick={isOpenCreate}>
-            <span className="tex-sm">New Vehicle</span>
-            <MdAdd className="w-4 h-4" />
-          </Button>
-          {/* <div className="w-full flex flex-col lg:flex-row items-center gap-2">
+            <Button
+              type="button"
+              variant="primary"
+              className="rounded-lg hover:opacity-70 active:scale-90"
+              onClick={isOpenCreate}>
+              <span className="tex-sm">New Vehicle</span>
+              <MdAdd className="w-4 h-4" />
+            </Button>
+            {/* <div className="w-full flex flex-col lg:flex-row items-center gap-2">
           </div> */}
-        </div>
+          </div>
 
-        <div className="w-full">
-          <SelectTables
-            loading={loading}
-            setLoading={setLoading}
-            pages={pages}
-            setPages={setPages}
-            limit={limit}
-            setLimit={setLimit}
-            pageCount={pageCount}
-            columns={columns}
-            dataTable={dataTable}
-            total={total}
-            setIsSelected={setIsSelected}
-            classTable=""
-          />
+          <div className="w-full">
+            <SelectTables
+              loading={loading}
+              setLoading={setLoading}
+              pages={pages}
+              setPages={setPages}
+              limit={limit}
+              setLimit={setLimit}
+              pageCount={pageCount}
+              columns={columns}
+              dataTable={dataTable}
+              total={total}
+              setIsSelected={setIsSelected}
+              classTable=""
+            />
+          </div>
         </div>
       </div>
 

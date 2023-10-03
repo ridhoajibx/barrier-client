@@ -13,6 +13,7 @@ import { getAuthMe, selectAuth } from "@/redux/features/AuthenticationReducers";
 import { useEffect, useState } from "react";
 import Doughnutcharts from "@/components/chart/Doughnutcharts";
 import AreaChart from "@/components/chart/AreaChart";
+import Navbar from "@/components/layouts/header/Navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -317,10 +318,12 @@ const Home = ({ pageProps }: Props) => {
     <DashboardLayouts
       userDefault="/images/logo.png"
       token={token}
+      refeshToken={refreshToken}
       header={"header"}
       title={"title"}>
-      <div className="w-full bg-gray p-4 overflow-auto md:p-6 2xl:p-10">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+      <div className="relative w-full bg-gray overflow-auto">
+        <Navbar />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 md:p-6 2xl:p-10">
           <div className="w-full lg:col-span-2">
             <div className="w-full mb-3">
               <button
