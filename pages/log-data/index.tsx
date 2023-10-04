@@ -342,7 +342,6 @@ export default function Rfid({ pageProps }: Props) {
           $or: [
             { rfidNumber: { $contL: query?.search } },
             { rfidType: { $contL: query?.search } },
-            { rfidType: { $contL: query?.search } },
             { employeeName: { $contL: query?.search } },
             { employeeVehicle: { $contL: query?.search } },
             { employeeLicencePlate: { $contL: query?.search } },
