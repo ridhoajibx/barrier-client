@@ -205,7 +205,8 @@ export default function Rfid({ pageProps }: Props) {
   const [search, setSearch] = useState<string | any>(null);
   const [sort, setSort] = useState<Options | any>(null);
   const [types, setTypes] = useState<Options | any>(null);
-  const [typesOpt, setTypesOpt] = useState<Options[] | any[]>([]);
+  const [vehicleType, setVehicleType] = useState<Options | any>(null);
+  const [vehicleTypeOpt, setVehicleTypeOpt] = useState<Options[] | any[]>([]);
 
   const [dataTable, setDataTable] = useState<any[] | any>([]);
   const [isSelected, setIsSelected] = useState<any[] | any>([]);
@@ -286,7 +287,17 @@ export default function Rfid({ pageProps }: Props) {
     if (query?.types) {
       setTypes({ value: query?.types, label: query?.types });
     }
-  }, [query?.page, query?.limit, query?.search, query?.sort, query?.types]);
+    if (query?.vehicleType) {
+      setVehicleType({ value: query?.vehicleType, label: query?.vehicleType });
+    }
+  }, [
+    query?.page,
+    query?.limit,
+    query?.search,
+    query?.sort,
+    query?.types,
+    query?.vehicleType,
+  ]);
 
   useEffect(() => {
     let qr: any = {
@@ -297,17 +308,18 @@ export default function Rfid({ pageProps }: Props) {
     if (search) qr = { ...qr, search: search };
     if (sort) qr = { ...qr, sort: sort?.value };
     if (types) qr = { ...qr, types: types?.value };
+    if (vehicleType) qr = { ...qr, vehicleType: vehicleType?.value };
 
     router.replace({ pathname, query: qr });
-  }, [pages, limit, search, sort, types]);
+  }, [pages, limit, search, sort, types, vehicleType]);
 
   const filters = useMemo(() => {
     const qb = RequestQueryBuilder.create();
 
     const search = {
       $and: [
-        { rfidType: { $contL: query?.search } },
-        { "vehicleType.vehicleTypeName": { $contL: query?.types } },
+        { "vehicleType.vehicleTypeName": { $contL: query?.vehicleType } },
+        { rfidType: { $contL: query?.types } },
         {
           $or: [
             { rfidNumber: { $contL: query?.search } },
@@ -338,7 +350,14 @@ export default function Rfid({ pageProps }: Props) {
     }
     qb.query();
     return qb;
-  }, [query?.page, query?.limit, query?.search, query?.sort, query?.types]);
+  }, [
+    query?.page,
+    query?.limit,
+    query?.search,
+    query?.sort,
+    query?.types,
+    query?.vehicleType,
+  ]);
 
   useEffect(() => {
     if (token) {
@@ -394,14 +413,14 @@ export default function Rfid({ pageProps }: Props) {
         });
       });
     }
-    setTypesOpt(newArr);
+    setVehicleTypeOpt(newArr);
   }, [vehicleTypes]);
 
   const columns = useMemo<ColumnDef<RfidProps, any>[]>(
     () => [
       {
         accessorKey: "rfidNumber",
-        header: (info) => <div className="uppercase">RFID No.</div>,
+        header: (info) => <div className="uppercase">RFID</div>,
         cell: ({ getValue, row }) => {
           return <div>{getValue() || "-"}</div>;
         },
@@ -414,7 +433,7 @@ export default function Rfid({ pageProps }: Props) {
           return <div>{getValue() || "-"}</div>;
         },
         header: (props) => (
-          <div className="w-full text-left uppercase">RFID Type</div>
+          <div className="w-full text-left uppercase">Type</div>
         ),
         footer: (props) => props.column.id,
         enableColumnFilter: false,
@@ -541,7 +560,7 @@ export default function Rfid({ pageProps }: Props) {
       <div className="w-full bg-white h-full overflow-auto relative">
         <Navbar />
         <div className="w-full md:p-6 2xl:p-10">
-          <div className="w-full grid grid-cols-1 lg:grid-cols-5 gap-2.5 p-4">
+          <div className="w-full grid grid-cols-1 lg:grid-cols-6 gap-2.5 p-4">
             <div className="w-full lg:col-span-2">
               <SearchInput
                 className="w-full text-sm rounded-xl"
@@ -597,7 +616,6 @@ export default function Rfid({ pageProps }: Props) {
                 </label>
               </div>
             </div> */}
-
             <div className="w-full flex flex-col lg:flex-row items-center gap-2">
               <DropdownSelect
                 customStyles={stylesSelect}
@@ -611,7 +629,26 @@ export default function Rfid({ pageProps }: Props) {
                 isDisabled={false}
                 isMulti={false}
                 placeholder="All Type..."
-                options={typesOpt}
+                options={RfidTypeOptions}
+                icon=""
+                isClearable
+              />
+            </div>
+
+            <div className="w-full flex flex-col lg:flex-row items-center gap-2">
+              <DropdownSelect
+                customStyles={stylesSelect}
+                value={vehicleType}
+                onChange={setVehicleType}
+                error=""
+                className="text-sm font-normal text-gray-5 w-full lg:w-2/10"
+                classNamePrefix=""
+                formatOptionLabel=""
+                instanceId="1"
+                isDisabled={false}
+                isMulti={false}
+                placeholder="Vehicles..."
+                options={vehicleTypeOpt}
                 icon=""
                 isClearable
               />
@@ -652,7 +689,7 @@ export default function Rfid({ pageProps }: Props) {
           token={token}
           items={isForm}
           isClose={isCloseCreate}
-          vehicleOption={typesOpt}
+          vehicleOption={vehicleTypeOpt}
           refreshData={() =>
             dispatch(getRfids({ token, params: filters.queryObject }))
           }
@@ -665,7 +702,7 @@ export default function Rfid({ pageProps }: Props) {
           token={token}
           items={isForm}
           isClose={isCloseUpdate}
-          vehicleOption={typesOpt}
+          vehicleOption={vehicleTypeOpt}
           refreshData={() =>
             dispatch(getRfids({ token, params: filters.queryObject }))
           }
