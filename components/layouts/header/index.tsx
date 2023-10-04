@@ -167,10 +167,16 @@ const Header = ({
 
   const menuHeader = [
     {
-      name: "User Setting",
+      name: "Settings",
       description: "",
       href: () => {
-        console.log("click-3");
+        router.push({
+          pathname: "settings/user",
+          query: {
+            page: 1,
+            limit: 10,
+          },
+        });
       },
       icon: MdManageAccounts,
       classIcon: "",
