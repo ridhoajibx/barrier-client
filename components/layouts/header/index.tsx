@@ -167,7 +167,7 @@ const Header = ({
 
   const menuHeader = [
     {
-      name: "Account Setting",
+      name: "User Setting",
       description: "",
       href: () => {
         console.log("click-3");

@@ -349,7 +349,6 @@ export default function Rfid({ pageProps }: Props) {
             { guestName: { $contL: query?.search } },
             { guestVehicle: { $contL: query?.search } },
             { guestLicencePlate: { $contL: query?.search } },
-            { rfid: { $contL: query?.search } },
           ],
         },
       ],
