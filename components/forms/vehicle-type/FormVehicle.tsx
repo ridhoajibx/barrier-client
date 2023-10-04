@@ -166,19 +166,19 @@ export default function FormVehicle(props: Props) {
             <label
               className="text-gray-500 font-semibold text-sm"
               htmlFor="vehicleName">
-              Vehicle No.
+              Vehicle Type Name
             </label>
             <div className="w-full flex">
               <input
                 type="text"
-                placeholder="Vehicle No."
+                placeholder="Vehicle Type Name"
                 autoFocus
                 id="vehicleName"
                 className={`bg-white w-full text-sm rounded-lg border border-stroke bg-transparent py-3 px-4 outline-none focus:border-primary focus-visible:shadow-none disabled:border-0 disabled:bg-transparent`}
                 {...register("vehicleTypeName", {
                   required: {
                     value: true,
-                    message: "Vehicle No. is required.",
+                    message: "Vehicle Type Name is required.",
                   },
                 })}
               />

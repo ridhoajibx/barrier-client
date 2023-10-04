@@ -385,7 +385,7 @@ export default function VehicleType({ pageProps }: Props) {
           return <div>{getValue()}</div>;
         },
         header: (props) => (
-          <div className="w-full text-left uppercase">Vehicle No.</div>
+          <div className="w-full text-left uppercase">Vehicle Type</div>
         ),
         footer: (props) => props.column.id,
         enableColumnFilter: false,
