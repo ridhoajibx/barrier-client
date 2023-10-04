@@ -126,7 +126,7 @@ export default function FormVehicle(props: Props) {
         className="p-4 bg-white rounded-t-xl border-b-2 border-gray">
         <div className="w-full flex flex-col gap-1 px-2">
           <h3 className="text-lg font-semibold">
-            {isUpdate ? "Edit" : "Add"} Vehicle Type
+            {isUpdate ? "Update" : "New"} Vehicle Type
           </h3>
           <p className="text-gray-5 text-sm">
             Fill your vehicle type information.

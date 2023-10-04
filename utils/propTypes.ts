@@ -1,3 +1,8 @@
+export interface OptionProps {
+  value: any;
+  label: any;
+}
+
 export interface UserProps {
   id?: number | string | any;
   username?: string | any;

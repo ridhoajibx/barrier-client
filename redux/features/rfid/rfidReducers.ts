@@ -36,7 +36,7 @@ interface HeadersConfiguration {
 
 interface RfidData {
   id?: any;
-  data: any;
+  data?: any;
   token?: any;
   isSuccess: () => void;
 }
