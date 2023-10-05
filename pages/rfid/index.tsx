@@ -607,7 +607,7 @@ export default function Rfid({ pageProps }: Props) {
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", `RFID-${date}.xlxs`);
+        link.setAttribute("download", `RFID-${date}.xlsx`);
         document.body.appendChild(link);
         link.click();
         toast.dark("Export file's successfully");
