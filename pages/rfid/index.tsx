@@ -1,7 +1,14 @@
 import Image from "next/image";
 import { Inter } from "next/font/google";
 import DashboardLayouts from "@/components/layouts/DashboardLayouts";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import {
+  ChangeEvent,
+  Fragment,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import SelectTables from "@/components/tables/layouts";
 import { ColumnDef } from "@tanstack/react-table";
 import moment from "moment";
@@ -11,8 +18,11 @@ import ReactDatePicker from "react-datepicker";
 import {
   MdAdd,
   MdDelete,
+  MdDocumentScanner,
+  MdDownload,
   MdEdit,
   MdOutlineCalendarToday,
+  MdUpload,
 } from "react-icons/md";
 import { useAppDispatch, useAppSelector } from "@/redux/Hooks";
 import { getAuthMe, selectAuth } from "@/redux/features/AuthenticationReducers";
@@ -22,6 +32,7 @@ import Navbar from "@/components/layouts/header/Navbar";
 import {
   deleteRfid,
   getRfids,
+  importRfid,
   selectRfidManagement,
 } from "@/redux/features/rfid/rfidReducers";
 import { useRouter } from "next/router";
@@ -37,6 +48,8 @@ import FormRFID from "@/components/forms/rfid/FormRFID";
 import { ModalHeader } from "@/components/modal/ModalComponent";
 import { toast } from "react-toastify";
 import { FaCircleNotch } from "react-icons/fa";
+import axios from "axios";
+import { convertBytes, toBase64 } from "@/utils/useFunction";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -227,6 +240,14 @@ export default function Rfid({ pageProps }: Props) {
   const [isCreate, setIsCreate] = useState<boolean>(false);
   const [isUpdate, setIsUpdate] = useState<boolean>(false);
   const [isDelete, setIsDelete] = useState<boolean>(false);
+  // export
+  const [loadingExport, setLoadingExport] = useState<boolean>(false);
+  const [isExport, setIsExport] = useState<boolean>(false);
+  // import
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [loadingImport, setLoadingImport] = useState<boolean>(false);
+  const [isImport, setIsImport] = useState<boolean>(false);
+  const [files, setFiles] = useState<any[]>([]);
 
   const isOpenCreate = () => {
     setIsCreate(true);
@@ -270,6 +291,26 @@ export default function Rfid({ pageProps }: Props) {
   const isCloseDelete = () => {
     setIsForm(null);
     setIsDelete(false);
+  };
+
+  const isOpenExport = () => {
+    setIsExport(true);
+  };
+
+  const isCloseExport = () => {
+    setIsExport(false);
+  };
+
+  const isOpenImport = () => {
+    setIsImport(true);
+  };
+
+  const isCloseImport = () => {
+    if (fileRef.current) {
+      fileRef.current.value = "";
+      setFiles([]);
+    }
+    setIsImport(false);
   };
 
   // data-table
@@ -549,6 +590,97 @@ export default function Rfid({ pageProps }: Props) {
     }
   };
 
+  // export
+  const onExportData = async (params: any) => {
+    let date = moment(new Date()).format("lll");
+    setLoadingExport(true);
+    try {
+      axios({
+        url: `rfid/export`,
+        method: "GET",
+        responseType: "blob",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${params.token}`,
+        },
+      }).then((response) => {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `RFID-${date}.xlxs`);
+        document.body.appendChild(link);
+        link.click();
+        toast.dark("Export file's successfully");
+        setLoadingExport(false);
+        isCloseExport();
+      });
+    } catch (error: any) {
+      const { data, status } = error.response;
+      let newError: any = { message: data.message[0] };
+      toast.dark(newError.message);
+      setLoadingExport(false);
+    }
+  };
+
+  // import
+  const onSelectMultiImage = (e: ChangeEvent<HTMLInputElement>) => {
+    const filePathsPromises: any[] = [];
+    const fileObj = e.target.files;
+    const preview = async () => {
+      if (fileObj) {
+        const totalFiles = e?.target?.files?.length;
+        if (totalFiles) {
+          for (let i = 0; i < totalFiles; i++) {
+            const img = fileObj[i];
+            // console.log(img, 'image obj')
+            filePathsPromises.push(toBase64(img));
+            const filePaths = await Promise.all(filePathsPromises);
+            const mappedFiles = filePaths.map((base64File) => ({
+              documentNumber: "",
+              documentName: base64File?.name,
+              documentSize: base64File?.size,
+              documentSource: base64File?.images,
+            }));
+            setFiles(mappedFiles);
+          }
+        }
+      }
+    };
+    if (!fileObj) {
+      return null;
+    } else {
+      preview();
+    }
+  };
+
+  const onDeleteFiles = (id: any) => {
+    if (fileRef.current) {
+      fileRef.current.value = "";
+      setFiles(files.splice(id, 0));
+    }
+  };
+
+  const onImportData = async (value: any) => {
+    if (!value) {
+      return;
+    }
+    let newObj: any = {
+      excelFile: value?.document?.length > 0 ? value?.document[0] : "",
+    };
+    console.log(newObj, "import");
+    dispatch(
+      importRfid({
+        token,
+        data: newObj,
+        isSuccess: () => {
+          toast.dark("Document has been imported");
+          dispatch(getRfids({ token, params: filters?.queryObject }));
+          isCloseImport();
+        },
+      })
+    );
+  };
+
   return (
     <DashboardLayouts
       userDefault="/images/logo.png"
@@ -560,7 +692,7 @@ export default function Rfid({ pageProps }: Props) {
       <div className="w-full bg-white h-full overflow-auto relative">
         <Navbar />
         <div className="w-full md:p-6 2xl:p-10">
-          <div className="w-full grid grid-cols-1 lg:grid-cols-6 gap-2.5 p-4">
+          <div className="w-full grid grid-cols-1 lg:grid-cols-8 gap-2.5 p-4">
             <div className="w-full lg:col-span-2">
               <SearchInput
                 className="w-full text-sm rounded-xl"
@@ -589,33 +721,6 @@ export default function Rfid({ pageProps }: Props) {
               />
             </div>
 
-            {/* <div className="w-full flex flex-col lg:flex-row items-center gap-2">
-              <div className="w-full">
-                <label className="w-full text-gray-5 overflow-hidden">
-                  <div className="relative">
-                    <ReactDatePicker
-                      selectsRange={true}
-                      startDate={startDate}
-                      endDate={endDate}
-                      onChange={(update: any) => {
-                        setDateRange(update);
-                      }}
-                      isClearable={false}
-                      placeholderText={"Select date"}
-                      todayButton
-                      dropdownMode="select"
-                      peekNextMonth
-                      showMonthDropdown
-                      showYearDropdown
-                      disabled={false}
-                      clearButtonClassName="after:w-10 after:h-10 h-10 w-10"
-                      className="text-sm lg:text-md w-full text-gray-5 rounded-lg border border-stroke bg-transparent py-4 pl-12 pr-6 outline-none focus:border-primary focus-visible:shadow-none "
-                    />
-                    <MdOutlineCalendarToday className="absolute left-4 top-4 h-6 w-6 text-gray-5" />
-                  </div>
-                </label>
-              </div>
-            </div> */}
             <div className="w-full flex flex-col lg:flex-row items-center gap-2">
               <DropdownSelect
                 customStyles={stylesSelect}
@@ -661,6 +766,24 @@ export default function Rfid({ pageProps }: Props) {
               onClick={isOpenCreate}>
               <span className="tex-sm">New RFID</span>
               <MdAdd className="w-4 h-4" />
+            </Button>
+
+            <Button
+              type="button"
+              variant="primary-outline"
+              className="rounded-lg hover:opacity-70 active:scale-90 items-center"
+              onClick={isOpenExport}>
+              <span className="tex-sm">Export</span>
+              <MdDownload className="w-5 h-5" />
+            </Button>
+
+            <Button
+              type="button"
+              variant="primary"
+              className="rounded-lg hover:opacity-70 active:scale-90"
+              onClick={isOpenImport}>
+              <span className="tex-sm">Import</span>
+              <MdUpload className="w-4 h-4" />
             </Button>
           </div>
 
@@ -749,6 +872,136 @@ export default function Rfid({ pageProps }: Props) {
                 </Fragment>
               ) : (
                 <span className="text-xs">Yes, Delete it!</span>
+              )}
+            </Button>
+          </div>
+        </Fragment>
+      </Modal>
+
+      {/* export */}
+      <Modal size="small" onClose={isCloseExport} isOpen={isExport}>
+        <Fragment>
+          <ModalHeader
+            className="p-4 border-b-2 border-gray mb-3"
+            isClose={true}
+            onClick={isCloseExport}>
+            <div className="flex flex-col gap-1">
+              <h3 className="text-lg font-semibold">Export RFID data.</h3>
+              <p className="text-gray-5">Do you want to export RFID Data ?</p>
+            </div>
+          </ModalHeader>
+          <div className="w-full flex items-center px-4 justify-end gap-2 mb-3">
+            <Button
+              type="button"
+              variant="secondary-outline"
+              className="rounded-lg border-2 border-gray-2 shadow-2 active:scale-90"
+              onClick={isCloseExport}>
+              <span className="text-xs font-semibold">Discard</span>
+            </Button>
+
+            <Button
+              type="button"
+              variant="primary"
+              className="rounded-lg border-2 border-primary active:scale-90"
+              onClick={() => onExportData({ token })}
+              disabled={loadingExport}>
+              {loadingExport ? (
+                <Fragment>
+                  <span className="text-xs">Processing...</span>
+                  <FaCircleNotch className="w-4 h-4 animate-spin-1.5" />
+                </Fragment>
+              ) : (
+                <span className="text-xs">Yes, Export it!</span>
+              )}
+            </Button>
+          </div>
+        </Fragment>
+      </Modal>
+
+      {/* import */}
+      <Modal size="small" onClose={isCloseImport} isOpen={isImport}>
+        <Fragment>
+          <ModalHeader
+            className="p-4 border-b-2 border-gray mb-3"
+            isClose={true}
+            onClick={isCloseImport}>
+            <div className="flex flex-col gap-1">
+              <h3 className="text-lg font-semibold">Import RFID data.</h3>
+              <p className="text-gray-5">Do you want to import RFID Data ?</p>
+            </div>
+          </ModalHeader>
+
+          <div className="w-full flex flex-col px-4 gap-2 mb-3">
+            <div className="w-full flex gap-2">
+              <div className="w-full flex flex-col gap-2">
+                <div className="font-semibold">Document</div>
+                {files && files?.length > 0
+                  ? files?.map((file, id) => {
+                      return (
+                        <div key={id} className="w-full grid grid-cols-6 gap-2">
+                          <div className="w-full flex max-w-[50px] h-[50px] min-h-[50px] border border-gray shadow-card rounded-lg justify-center items-center">
+                            <MdDocumentScanner className="w-6 h-6" />
+                          </div>
+                          <div className="w-full col-span-4 text-sm">
+                            <p>{file?.documentName}</p>
+                            <p>
+                              {file?.documentSize
+                                ? convertBytes({ bytes: file?.documentSize })
+                                : "-"}
+                            </p>
+                          </div>
+
+                          <div className="w-full max-w-max flex justify-center items-center">
+                            <Button
+                              type="button"
+                              variant="danger"
+                              className={`rounded-lg text-sm py-1 px-2 shadow-card hover:opacity-90 active:scale-95 ml-auto`}
+                              onClick={() => onDeleteFiles(id)}>
+                              <MdDelete className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })
+                  : null}
+              </div>
+            </div>
+            <input
+              type="file"
+              id="document"
+              placeholder="Upload Document"
+              autoFocus
+              className={`w-full focus:outline-none max-w-max text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-2 file:border-primary file:text-sm file:font-semibold file:bg-violet-50 file:text-primary-700 hover:file:bg-violet-100 ${
+                files?.length > 0 ? "hidden" : ""
+              }`}
+              onChange={onSelectMultiImage}
+              ref={fileRef}
+              accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+            />
+          </div>
+
+          <div className="w-full flex items-center p-4 justify-end gap-2 border-t-2 border-gray">
+            <Button
+              type="button"
+              variant="secondary-outline"
+              className="rounded-lg border-2 border-gray-2 shadow-2 active:scale-90"
+              onClick={isCloseImport}>
+              <span className="text-xs font-semibold">Discard</span>
+            </Button>
+
+            <Button
+              type="button"
+              variant="primary"
+              className="rounded-lg border-2 border-primary active:scale-90"
+              onClick={() => onImportData({ token, data })}
+              disabled={loadingImport}>
+              {loadingImport ? (
+                <Fragment>
+                  <span className="text-xs">Processing...</span>
+                  <FaCircleNotch className="w-4 h-4 animate-spin-1.5" />
+                </Fragment>
+              ) : (
+                <span className="text-xs">Yes, Import it!</span>
               )}
             </Button>
           </div>

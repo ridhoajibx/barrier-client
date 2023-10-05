@@ -11,6 +11,7 @@ import ReactDatePicker from "react-datepicker";
 import {
   MdAdd,
   MdDelete,
+  MdDownload,
   MdEdit,
   MdOutlineCalendarToday,
 } from "react-icons/md";
@@ -42,6 +43,7 @@ import {
   selectRfidLogManagement,
 } from "@/redux/features/rfid-log/rfidLogReducers";
 import FormRFIDLog from "@/components/forms/logs/FormRFIDLog";
+import axios from "axios";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -215,7 +217,7 @@ export default function Rfid({ pageProps }: Props) {
 
   const [dataTable, setDataTable] = useState<any[] | any>([]);
   const [isSelected, setIsSelected] = useState<any[] | any>([]);
-  const [loading, setLoading] = useState<false>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const now = new Date();
   const [start, setStart] = useState(
@@ -232,6 +234,9 @@ export default function Rfid({ pageProps }: Props) {
   const [isCreate, setIsCreate] = useState<boolean>(false);
   const [isUpdate, setIsUpdate] = useState<boolean>(false);
   const [isDelete, setIsDelete] = useState<boolean>(false);
+  // export
+  const [loadingExport, setLoadingExport] = useState<boolean>(false);
+  const [isExport, setIsExport] = useState<boolean>(false);
 
   const isOpenCreate = () => {
     setIsCreate(true);
@@ -260,6 +265,14 @@ export default function Rfid({ pageProps }: Props) {
   const isCloseDelete = () => {
     setIsForm(null);
     setIsDelete(false);
+  };
+
+  const isOpenExport = () => {
+    setIsExport(true);
+  };
+
+  const isCloseExport = () => {
+    setIsExport(false);
   };
 
   // data-table
@@ -385,8 +398,6 @@ export default function Rfid({ pageProps }: Props) {
       dispatch(getRfidLogs({ token, params: filters?.queryObject }));
     }
   }, [token, filters]);
-
-  console.log("data-table :", rfids?.data);
 
   useEffect(() => {
     const newArr: RfidLogProps[] | any[] = [];
@@ -557,6 +568,37 @@ export default function Rfid({ pageProps }: Props) {
     }
   };
 
+  const onExportData = async (params: any) => {
+    let date = moment(new Date()).format("lll");
+    setLoadingExport(true);
+    try {
+      axios({
+        url: `rfid/log/export`,
+        method: "GET",
+        responseType: "blob",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${params.token}`,
+        },
+      }).then((response) => {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `LOG-${date}.xlsx`);
+        document.body.appendChild(link);
+        link.click();
+        toast.dark("Export file's successfully");
+        setLoadingExport(false);
+        isCloseExport();
+      });
+    } catch (error: any) {
+      const { data, status } = error.response;
+      let newError: any = { message: data.message[0] };
+      toast.dark(newError.message);
+      setLoadingExport(false);
+    }
+  };
+
   return (
     <DashboardLayouts
       userDefault="/images/logo.png"
@@ -568,7 +610,7 @@ export default function Rfid({ pageProps }: Props) {
       <div className="w-full bg-white h-full overflow-auto relative">
         <Navbar />
         <div className="w-full md:p-6 2xl:p-10">
-          <div className="w-full grid grid-cols-1 lg:grid-cols-5 gap-2.5 p-4">
+          <div className="w-full grid grid-cols-1 lg:grid-cols-6 gap-2.5 p-4">
             <div className="w-full lg:col-span-2">
               <SearchInput
                 className="w-full text-sm rounded-xl"
@@ -578,6 +620,7 @@ export default function Rfid({ pageProps }: Props) {
                 placeholder="Search..."
               />
             </div>
+
             <div className="w-full flex flex-col lg:flex-row items-center gap-2">
               <DropdownSelect
                 customStyles={stylesSelectSort}
@@ -624,6 +667,7 @@ export default function Rfid({ pageProps }: Props) {
                 </label>
               </div>
             </div>
+
             <div className="w-full flex flex-col lg:flex-row items-center gap-2">
               <DropdownSelect
                 customStyles={stylesSelect}
@@ -642,6 +686,15 @@ export default function Rfid({ pageProps }: Props) {
                 isClearable
               />
             </div>
+
+            <Button
+              type="button"
+              variant="primary-outline"
+              className="rounded-lg hover:opacity-70 active:scale-90 items-center"
+              onClick={isOpenExport}>
+              <span className="tex-sm">Export</span>
+              <MdDownload className="w-5 h-5" />
+            </Button>
           </div>
 
           <div className="w-full">
@@ -715,6 +768,48 @@ export default function Rfid({ pageProps }: Props) {
                 </Fragment>
               ) : (
                 <span className="text-xs">Yes, Delete it!</span>
+              )}
+            </Button>
+          </div>
+        </Fragment>
+      </Modal>
+
+      {/* export vehicle */}
+      <Modal size="small" onClose={isCloseExport} isOpen={isExport}>
+        <Fragment>
+          <ModalHeader
+            className="p-4 border-b-2 border-gray mb-3"
+            isClose={true}
+            onClick={isCloseExport}>
+            <div className="flex flex-col gap-1">
+              <h3 className="text-lg font-semibold">Export RFID Log data.</h3>
+              <p className="text-gray-5">
+                Do you want to export RFID Log Data ?
+              </p>
+            </div>
+          </ModalHeader>
+          <div className="w-full flex items-center px-4 justify-end gap-2 mb-3">
+            <Button
+              type="button"
+              variant="secondary-outline"
+              className="rounded-lg border-2 border-gray-2 shadow-2 active:scale-90"
+              onClick={isCloseExport}>
+              <span className="text-xs font-semibold">Discard</span>
+            </Button>
+
+            <Button
+              type="button"
+              variant="primary"
+              className="rounded-lg border-2 border-primary active:scale-90"
+              onClick={() => onExportData({ token })}
+              disabled={loadingExport}>
+              {loadingExport ? (
+                <Fragment>
+                  <span className="text-xs">Processing...</span>
+                  <FaCircleNotch className="w-4 h-4 animate-spin-1.5" />
+                </Fragment>
+              ) : (
+                <span className="text-xs">Yes, Export it!</span>
               )}
             </Button>
           </div>

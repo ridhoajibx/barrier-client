@@ -191,6 +191,38 @@ export const updateRfId = createAsyncThunk<any, RfidData, { state: RootState }>(
   }
 );
 
+export const importRfid = createAsyncThunk<any, RfidData, { state: RootState }>(
+  "/rfid/import",
+  async (params, { getState }) => {
+    let config: HeadersConfiguration = {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${params.token}`,
+      },
+    };
+    try {
+      const response = await axios.post(`rfid/import`, params.data, config);
+      const { data, status } = response;
+      if (status == 201) {
+        params.isSuccess();
+        return data;
+      } else {
+        throw response;
+      }
+    } catch (error: any) {
+      const { data, status } = error.response;
+      let newError: any = { message: data.message[0] };
+      toast.dark(newError.message);
+      if (error.response && error.response.status === 404) {
+        throw new Error("User not found");
+      } else {
+        throw new Error(newError.message);
+      }
+    }
+  }
+);
+
 export const deleteRfid = createAsyncThunk<any, RfidData, { state: RootState }>(
   "/rfid/delete",
   async (params, { getState }) => {
@@ -318,6 +350,26 @@ export const rfidSlice = createSlice({
         };
       })
       .addCase(updateRfId.rejected, (state, { error }) => {
+        state.pending = false;
+        state.error = true;
+        state.message = error.message;
+      })
+
+      // import-rfids
+      .addCase(importRfid.pending, (state) => {
+        return {
+          ...state,
+          pending: true,
+        };
+      })
+      .addCase(importRfid.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          pending: false,
+          error: false,
+        };
+      })
+      .addCase(importRfid.rejected, (state, { error }) => {
         state.pending = false;
         state.error = true;
         state.message = error.message;
