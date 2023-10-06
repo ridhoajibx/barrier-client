@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import Doughnutcharts from "@/components/chart/Doughnutcharts";
 import AreaChart from "@/components/chart/AreaChart";
 import Navbar from "@/components/layouts/header/Navbar";
+import { selectDailyManagement } from "@/redux/features/dashboard/dailyReducers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -36,7 +37,8 @@ const Home = ({ pageProps }: Props) => {
 
   const dispatch = useAppDispatch();
   const { data, pending, error } = useAppSelector(selectAuth);
-
+  // daily-data
+  const { dailyReport } = useAppSelector(selectDailyManagement);
   console.log(data, "data-auth");
 
   useEffect(() => {
