@@ -307,7 +307,7 @@ export default function UserSetting({ pageProps }: Props) {
         {
           $or: [
             { username: { $contL: query?.search } },
-            { fullname: { $contL: query?.search } },
+            { fullName: { $contL: query?.search } },
           ],
         },
       ],
@@ -324,7 +324,7 @@ export default function UserSetting({ pageProps }: Props) {
       });
     } else {
       qb.sortBy({
-        field: `fullname`,
+        field: `fullName`,
         order: !sort?.value ? "ASC" : sort.value,
       });
     }

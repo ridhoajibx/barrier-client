@@ -8,7 +8,7 @@ import parkingReducers from "./features/dashboard/parkingReducers";
 import dailyReducers from "./features/dashboard/dailyReducers";
 import reportReducers from "./features/dashboard/reportReducers";
 import arrivalReducers from "./features/dashboard/arrivalReducers";
-import peekTimeReducers from "./features/dashboard/peekTimeReducers";
+import peakTimeReducers from "./features/dashboard/peekTimeReducers";
 
 export const combinedReducer = combineReducers({
   //All reducer
@@ -28,7 +28,7 @@ export const combinedReducer = combineReducers({
   // chart-arrival
   arrivalManagement: arrivalReducers,
   // chart-peek-time
-  peekTimeManagement: peekTimeReducers,
+  peakTimeManagement: peakTimeReducers,
   // data dashboard parking & duration
   parkingManagement: parkingReducers,
 });

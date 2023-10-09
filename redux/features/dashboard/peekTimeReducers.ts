@@ -10,16 +10,16 @@ import type { RootState } from "../../store";
 
 // here we are typing the types for the state
 export type MainState = {
-  peekTimes: any[];
-  peekTime: any;
+  peakTimes: any[];
+  peakTime: any;
   pending: boolean;
   error: boolean;
   message: any;
 };
 
 const initialState: MainState = {
-  peekTimes: [],
-  peekTime: {},
+  peakTimes: [],
+  peakTime: {},
   pending: false,
   error: false,
   message: "",
@@ -34,7 +34,7 @@ interface HeadersConfiguration {
   };
 }
 
-interface PeekTimeData {
+interface PeakTimeData {
   id?: any;
   data?: any;
   token?: any;
@@ -58,11 +58,11 @@ function isRejectedAction(action: AnyAction): action is RejectedAction {
 }
 
 // get all report
-export const getPeekTimes = createAsyncThunk<
+export const getPeakTimes = createAsyncThunk<
   any,
   DefaultGetData,
   { state: RootState }
->("dashboard/peekTime", async (params, { getState }) => {
+>("dashboard/peakTime", async (params, { getState }) => {
   let config: HeadersConfiguration = {
     params: params.params,
     headers: {
@@ -72,7 +72,7 @@ export const getPeekTimes = createAsyncThunk<
     },
   };
   try {
-    const response = await axios.get("dashboard/peekTime", config);
+    const response = await axios.get("dashboard/peakTime", config);
     const { data, status } = response;
     if (status == 200) {
       return data;
@@ -84,18 +84,18 @@ export const getPeekTimes = createAsyncThunk<
     let newError: any = { message: data.message[0] };
     toast.dark(newError.message);
     if (error.response && error.response.status === 404) {
-      throw new Error("rfid not found");
+      throw new Error("peak time not found");
     } else {
       throw new Error(newError.message);
     }
   }
 });
 
-export const getPeekTimeById = createAsyncThunk<
+export const getPeakTimeById = createAsyncThunk<
   any,
   DefaultGetData,
   { state: RootState }
->("dashboard/peekTime/id", async (params, { getState }) => {
+>("dashboard/peakTime/id", async (params, { getState }) => {
   let config: HeadersConfiguration = {
     params: params.params,
     headers: {
@@ -105,7 +105,7 @@ export const getPeekTimeById = createAsyncThunk<
     },
   };
   try {
-    const response = await axios.get(`dashboard/peekTime/${params.id}`, config);
+    const response = await axios.get(`dashboard/peakTime/${params.id}`, config);
     const { data, status } = response;
     if (status == 200) {
       return data;
@@ -117,7 +117,7 @@ export const getPeekTimeById = createAsyncThunk<
     let newError: any = { message: data.message[0] };
     toast.dark(newError.message);
     if (error.response && error.response.status === 404) {
-      throw new Error("rfid not found");
+      throw new Error("peak time not found");
     } else {
       throw new Error(newError.message);
     }
@@ -125,20 +125,20 @@ export const getPeekTimeById = createAsyncThunk<
 });
 
 // SLICER
-export const peekTimeSlice = createSlice({
-  name: "peekTime",
+export const peakTimeSlice = createSlice({
+  name: "peakTime",
   initialState,
   reducers: {
     // leave this empty here
-    resetPeekTimes(state) {
-      state.peekTimes = [];
+    ressetPeakTimes(state) {
+      state.peakTimes = [];
       state.pending = false;
       state.error = false;
       state.message = "";
     },
 
-    resetPeekTime(state) {
-      state.peekTime = {};
+    ressetPeakTime(state) {
+      state.peakTime = {};
       state.pending = false;
       state.error = false;
       state.message = "";
@@ -150,42 +150,42 @@ export const peekTimeSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // get-report
-      .addCase(getPeekTimes.pending, (state) => {
+      .addCase(getPeakTimes.pending, (state) => {
         return {
           ...state,
           pending: true,
         };
       })
-      .addCase(getPeekTimes.fulfilled, (state, { payload }) => {
+      .addCase(getPeakTimes.fulfilled, (state, { payload }) => {
         return {
           ...state,
           pending: false,
           error: false,
-          peekTimes: payload,
+          peakTimes: payload,
         };
       })
-      .addCase(getPeekTimes.rejected, (state, { error }) => {
+      .addCase(getPeakTimes.rejected, (state, { error }) => {
         state.pending = false;
         state.error = true;
         state.message = error.message;
       })
 
-      // get-peekTime
-      .addCase(getPeekTimeById.pending, (state) => {
+      // get-peakTime
+      .addCase(getPeakTimeById.pending, (state) => {
         return {
           ...state,
           pending: true,
         };
       })
-      .addCase(getPeekTimeById.fulfilled, (state, { payload }) => {
+      .addCase(getPeakTimeById.fulfilled, (state, { payload }) => {
         return {
           ...state,
           pending: false,
           error: false,
-          peekTime: payload,
+          peakTime: payload,
         };
       })
-      .addCase(getPeekTimeById.rejected, (state, { error }) => {
+      .addCase(getPeakTimeById.rejected, (state, { error }) => {
         state.pending = false;
         state.error = true;
         state.message = error.message;
@@ -203,10 +203,10 @@ export const peekTimeSlice = createSlice({
 });
 // SLICER
 
-const peekTimeReducers = peekTimeSlice.reducer;
+const peakTimeReducers = peakTimeSlice.reducer;
 
-export const { resetPeekTimes, resetPeekTime } = peekTimeSlice.actions;
-export const selectpeekTimeManagement = (state: RootState) =>
-  state.peekTimeManagement;
+export const { ressetPeakTimes, ressetPeakTime } = peakTimeSlice.actions;
+export const selectPeakTimeManagement = (state: RootState) =>
+  state.peakTimeManagement;
 
-export default peekTimeReducers;
+export default peakTimeReducers;

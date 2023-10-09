@@ -14,7 +14,10 @@ import { useEffect, useMemo, useState } from "react";
 import Doughnutcharts from "@/components/chart/Doughnutcharts";
 import AreaChart from "@/components/chart/AreaChart";
 import Navbar from "@/components/layouts/header/Navbar";
-import { selectDailyManagement } from "@/redux/features/dashboard/dailyReducers";
+import {
+  getDailyReport,
+  selectDailyManagement,
+} from "@/redux/features/dashboard/dailyReducers";
 import {
   getReports,
   selectReportManagement,
@@ -23,15 +26,15 @@ import {
   getArrivals,
   selectArrivalManagement,
 } from "@/redux/features/dashboard/arrivalReducers";
-import {
-  getPeekTimes,
-  selectpeekTimeManagement,
-} from "@/redux/features/dashboard/peekTimeReducers";
 import { OptionProps } from "@/utils/propTypes";
 import DropdownSelect from "@/components/dropdown/DropdownSelect";
 import Barcharts from "@/components/chart/Barcharts";
 import { sortByArr } from "@/utils/useFunction";
 import moment from "moment";
+import {
+  getPeakTimes,
+  selectPeakTimeManagement,
+} from "@/redux/features/dashboard/peekTimeReducers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -98,14 +101,14 @@ const Home = ({ pageProps }: Props) => {
   // chart-arrival
   const { arrivals } = useAppSelector(selectArrivalManagement);
   // chart-peekTime
-  const { peekTimes } = useAppSelector(selectpeekTimeManagement);
+  const { peakTimes } = useAppSelector(selectPeakTimeManagement);
 
   const [isSelected, setIsSelected] = useState<OptionProps | any>(
     dropdownOption[0]
   );
 
   const [arrivalChart, setArrivalChart] = useState<any[] | any>([]);
-  const [peekTimeChart, setPeekTimeChart] = useState<any[] | any>([]);
+  const [peakTimeChart, setPeakTimeChart] = useState<any[] | any>([]);
 
   // weekly & monthly report
   const filters = useMemo(() => {
@@ -269,28 +272,54 @@ const Home = ({ pageProps }: Props) => {
   // get-peektime
   useEffect(() => {
     if (token) {
-      dispatch(getPeekTimes({ token, params: filters }));
+      dispatch(getPeakTimes({ token, params: filters }));
     }
   }, [token, filters]);
 
-  console.log(peekTimes, "peektime-data");
-  // end peektime
-
   useEffect(() => {
-    if (!token) {
-      return;
+    let newArr: any[] = [];
+    if (peakTimes?.length > 0) {
+      peakTimes?.map((item: any) => {
+        newArr.push(item);
+      });
     }
-    dispatch(
-      getAuthMe({
-        token,
-        callback: () => {
-          deleteCookie("accessToken");
-          deleteCookie("refreshToken");
-          deleteCookie("roles");
-        },
-      })
-    );
-  }, [token]);
+
+    setPeakTimeChart(newArr);
+  }, [peakTimes]);
+
+  const isSortChartPeakTime = useMemo(() => {
+    const getDate = (o: any) => {
+      return o?.label;
+    };
+    let sortByDate = sortByArr(getDate, true);
+    let sort = peakTimeChart?.length > 0 && peakTimeChart.sort(sortByDate);
+    return sort;
+  }, [peakTimeChart]);
+
+  const isShowChartPeakTime = useMemo(() => {
+    let labels: any[] = [];
+    let newObj: any = {};
+    let data: any[] = [];
+    let datasets: any[] = [];
+    if (isSortChartPeakTime?.length > 0) {
+      isSortChartPeakTime?.map((item: any) => {
+        labels.push(item.label);
+        data.push(item.data);
+      });
+    }
+    newObj = {
+      label: "Peak Time",
+      borderRadius: 5,
+      data: data,
+      backgroundColor: "rgb(53, 162, 235)",
+      barThickness: 30,
+    };
+    datasets.push(newObj);
+    return {
+      labels,
+      datasets,
+    };
+  }, [isSortChartPeakTime, isSelected]);
 
   let barData = {
     labels: [
@@ -358,6 +387,52 @@ const Home = ({ pageProps }: Props) => {
       },
     },
   };
+  // end peektime
+
+  // today-daily report
+  useEffect(() => {
+    if (token) {
+      dispatch(getDailyReport({ token, params: "" }));
+    }
+  }, [token]);
+
+  const isShowTodayReport = useMemo(() => {
+    let labels: any[] = ["Employee", "Guest"];
+    let datasets: any[] = [];
+
+    datasets = [
+      {
+        label: "# Votes",
+        data: [dailyReport?.employee, dailyReport?.guest],
+        backgroundColor: ["#0E5CBE", "#E9B824"],
+        borderColor: ["#0E5CBE", "#E9B824"],
+        borderWidth: 0,
+      },
+    ];
+    return {
+      labels,
+      datasets,
+    };
+  }, [dailyReport]);
+
+  console.log(dailyReport, "today-report");
+  // end-daily
+
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+    dispatch(
+      getAuthMe({
+        token,
+        callback: () => {
+          deleteCookie("accessToken");
+          deleteCookie("refreshToken");
+          deleteCookie("roles");
+        },
+      })
+    );
+  }, [token]);
 
   let doughnutData = {
     labels: ["Employee", "Guest"],
@@ -603,11 +678,11 @@ const Home = ({ pageProps }: Props) => {
               <div className="w-full mb-3">
                 <div className="w-full p-4 bg-white rounded-lg shadow-card">
                   <h3 className="font-thin text-lg text-gray-5">
-                    Peek Time{" "}
+                    Peak Time{" "}
                     <span className="capitalize">{isSelected?.value}</span>
                   </h3>
                   <Barcharts
-                    data={barData}
+                    data={isShowChartPeakTime || barData}
                     height="400"
                     options={barOptions}
                     className=""
@@ -632,8 +707,12 @@ const Home = ({ pageProps }: Props) => {
                       <MdOutlineDirectionsCarFilled className="w-6 h-6 text-primary" />
                     </span>
                     <div className="flex gap-1 items-center">
-                      <span className="font-bold">45</span>
-                      <span>Vehicles</span>
+                      <span className="font-bold">
+                        {dailyReport?.total || 0}
+                      </span>
+                      <span>
+                        {dailyReport?.total > 1 ? "Vehicles" : "Vehicle"}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -644,8 +723,12 @@ const Home = ({ pageProps }: Props) => {
                       <MdPeople className="w-6 h-6 text-primary" />
                     </span>
                     <div className="flex gap-1 items-center">
-                      <span className="font-bold">32</span>
-                      <span>People</span>
+                      <span className="font-bold">
+                        {dailyReport?.employee || 0}
+                      </span>
+                      <span>
+                        {dailyReport?.employee > 1 ? "People" : "Person"}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -656,8 +739,10 @@ const Home = ({ pageProps }: Props) => {
                       <MdCardMembership className="w-6 h-6 text-primary" />
                     </span>
                     <div className="flex gap-1 items-center">
-                      <span className="font-bold">32</span>
-                      <span>Areas</span>
+                      <span className="font-bold">
+                        {dailyReport?.guest || 0}
+                      </span>
+                      <span>{dailyReport?.guest > 1 ? "Areas" : "Area"}</span>
                     </div>
                   </div>
                 </div>
@@ -667,14 +752,14 @@ const Home = ({ pageProps }: Props) => {
               <div className="w-full flex items-center gap-2">
                 <div className="w-2/3">
                   <Doughnutcharts
-                    data={doughnutData}
+                    data={isShowTodayReport || doughnutData}
                     options={doughnutOptions}
                     className="w-full max-w-max"
                     height="300px"
                   />
                 </div>
                 <div className="w-1/3">
-                  {doughnutData?.datasets?.map((chart, index) => {
+                  {isShowTodayReport?.datasets?.map((chart, index) => {
                     return (
                       <div key={index} className="flex flex-col gap-2">
                         <div className="w-full flex items-center gap-2 text-left">
