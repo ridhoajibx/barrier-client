@@ -266,6 +266,7 @@ export default function DurationSetting({ pageProps }: Props) {
                           timeIntervals={60}
                           timeCaption="Duration"
                           dateFormat="HH:mm"
+                          timeFormat="HH:mm"
                           isClearable
                           clearButtonClassName="after:w-10 after:h-10 h-10 w-10"
                           className="text-sm lg:text-md w-full text-gray-5 rounded-lg border border-stroke bg-transparent py-4 pl-12 pr-6 outline-none focus:border-primary focus-visible:shadow-none "
@@ -309,10 +310,11 @@ export default function DurationSetting({ pageProps }: Props) {
                           timeIntervals={60}
                           timeCaption="Duration"
                           dateFormat="HH:mm"
+                          timeFormat="HH:mm"
                           isClearable
                           clearButtonClassName="after:w-10 after:h-10 h-10 w-10"
                           className="text-sm lg:text-md w-full text-gray-5 rounded-lg border border-stroke bg-transparent py-4 pl-12 pr-6 outline-none focus:border-primary focus-visible:shadow-none "
-                          popperClassName="w-full max-w-xs"
+                          popperClassName="w-full"
                         />
                       )}
                       name={`guest`}
