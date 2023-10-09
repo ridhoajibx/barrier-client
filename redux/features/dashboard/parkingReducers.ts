@@ -56,7 +56,7 @@ export const getParkings = createAsyncThunk<
   any,
   DefaultGetData,
   { state: RootState }
->("dashboard/weekly/report", async (params, { getState }) => {
+>("dashboard/parking", async (params, { getState }) => {
   let config: HeadersConfiguration = {
     params: params.params,
     headers: {
@@ -66,7 +66,7 @@ export const getParkings = createAsyncThunk<
     },
   };
   try {
-    const response = await axios.get("dashboard/weekly/report", config);
+    const response = await axios.get("dashboard/parking", config);
     const { data, status } = response;
     if (status == 200) {
       return data;
@@ -78,7 +78,7 @@ export const getParkings = createAsyncThunk<
     let newError: any = { message: data.message[0] };
     toast.dark(newError.message);
     if (error.response && error.response.status === 404) {
-      throw new Error("rfid not found");
+      throw new Error("parking not found");
     } else {
       throw new Error(newError.message);
     }
@@ -89,7 +89,7 @@ export const getParkingById = createAsyncThunk<
   any,
   DefaultGetData,
   { state: RootState }
->("dashboard/weekly/arrival", async (params, { getState }) => {
+>("dashboard/parking/id", async (params, { getState }) => {
   let config: HeadersConfiguration = {
     params: params.params,
     headers: {
@@ -99,7 +99,7 @@ export const getParkingById = createAsyncThunk<
     },
   };
   try {
-    const response = await axios.get("dashboard/weekly/arrival", config);
+    const response = await axios.get(`dashboard/parking/${params.id}`, config);
     const { data, status } = response;
     if (status == 200) {
       return data;
@@ -111,7 +111,7 @@ export const getParkingById = createAsyncThunk<
     let newError: any = { message: data.message[0] };
     toast.dark(newError.message);
     if (error.response && error.response.status === 404) {
-      throw new Error("rfid not found");
+      throw new Error("parking not found");
     } else {
       throw new Error(newError.message);
     }
@@ -122,7 +122,7 @@ export const getDuration = createAsyncThunk<
   any,
   DefaultGetData,
   { state: RootState }
->("dashboard/weekly/peekTime", async (params, { getState }) => {
+>("dashboard/parking/duration", async (params, { getState }) => {
   let config: HeadersConfiguration = {
     params: params.params,
     headers: {
@@ -132,7 +132,7 @@ export const getDuration = createAsyncThunk<
     },
   };
   try {
-    const response = await axios.get("dashboard/weekly/peekTime", config);
+    const response = await axios.get("dashboard/parking/duration", config);
     const { data, status } = response;
     if (status == 200) {
       return data;

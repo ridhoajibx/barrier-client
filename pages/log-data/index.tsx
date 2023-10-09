@@ -14,6 +14,7 @@ import {
   MdDownload,
   MdEdit,
   MdOutlineCalendarToday,
+  MdWarning,
 } from "react-icons/md";
 import { useAppDispatch, useAppSelector } from "@/redux/Hooks";
 import { getAuthMe, selectAuth } from "@/redux/features/AuthenticationReducers";
@@ -44,6 +45,10 @@ import {
 } from "@/redux/features/rfid-log/rfidLogReducers";
 import FormRFIDLog from "@/components/forms/logs/FormRFIDLog";
 import axios from "axios";
+import {
+  getDuration,
+  selectParkingManagement,
+} from "@/redux/features/dashboard/parkingReducers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -180,6 +185,8 @@ export default function Rfid({ pageProps }: Props) {
   const { logs, pending } = useAppSelector(selectRfidLogManagement);
   // data vehicle-type
   const { vehicleTypes } = useAppSelector(selectVehicleTypeManagement);
+  // duration
+  const { duration } = useAppSelector(selectParkingManagement);
 
   useEffect(() => {
     if (token) {
@@ -416,6 +423,12 @@ export default function Rfid({ pageProps }: Props) {
     setTotal(newTotal);
   }, [logs]);
 
+  useEffect(() => {
+    if (token) {
+      dispatch(getDuration({ token, params: "" }));
+    }
+  }, [token]);
+
   const columns = useMemo<ColumnDef<RfidLogProps, any>[]>(
     () => [
       {
@@ -501,6 +514,48 @@ export default function Rfid({ pageProps }: Props) {
         enableColumnFilter: false,
       },
       {
+        accessorKey: "duration",
+        cell: ({ row, getValue }) => {
+          const { rfidType } = row?.original;
+          let guest = duration?.guest;
+          let employee = duration?.employee;
+          let filterEmployee = getValue() > employee;
+          let filterGuest = getValue() > guest;
+          console.log(filterGuest, "duration-result");
+          if (rfidType == "guest") {
+            return (
+              <div
+                className={`flex items-center gap-2${
+                  filterGuest ? " text-danger" : ""
+                }`}>
+                <span>{getValue() || "-"}</span>
+                <MdWarning
+                  className={`w-4 h-4${filterGuest ? "" : " hidden"}`}
+                />
+              </div>
+            );
+          } else {
+            return (
+              <div
+                className={`flex items-center gap-2${
+                  filterEmployee ? " text-danger" : ""
+                }`}>
+                <span>{getValue() || "-"}</span>
+                <MdWarning
+                  className={`w-4 h-4${filterGuest ? "" : " hidden"}`}
+                />
+              </div>
+            );
+          }
+        },
+        header: (props) => (
+          <div className="w-full text-left uppercase">Duration</div>
+        ),
+        footer: (props) => props.column.id,
+        enableColumnFilter: false,
+        size: 150,
+      },
+      {
         accessorKey: "departure",
         cell: ({ row, getValue }) => {
           return <div>{!getValue() ? "-" : dateFormat(getValue())}</div>;
@@ -547,7 +602,7 @@ export default function Rfid({ pageProps }: Props) {
         enableColumnFilter: false,
       },
     ],
-    []
+    [duration]
   );
 
   // delete

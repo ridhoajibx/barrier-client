@@ -5,6 +5,7 @@ import {
   MdCardMembership,
   MdOutlineDirectionsCarFilled,
   MdPeople,
+  MdWarning,
 } from "react-icons/md";
 import { GetServerSideProps } from "next";
 import { deleteCookie, getCookies } from "cookies-next";
@@ -26,7 +27,7 @@ import {
   getArrivals,
   selectArrivalManagement,
 } from "@/redux/features/dashboard/arrivalReducers";
-import { OptionProps } from "@/utils/propTypes";
+import { OptionProps, ParkingProps } from "@/utils/propTypes";
 import DropdownSelect from "@/components/dropdown/DropdownSelect";
 import Barcharts from "@/components/chart/Barcharts";
 import { sortByArr } from "@/utils/useFunction";
@@ -35,6 +36,15 @@ import {
   getPeakTimes,
   selectPeakTimeManagement,
 } from "@/redux/features/dashboard/peekTimeReducers";
+import {
+  getDuration,
+  getParkings,
+  selectParkingManagement,
+} from "@/redux/features/dashboard/parkingReducers";
+import { useRouter } from "next/router";
+import { RequestQueryBuilder } from "@nestjsx/crud-request";
+import { ColumnDef } from "@tanstack/react-table";
+import SelectTables from "@/components/tables/layouts";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -90,10 +100,12 @@ const dropdownOption: OptionProps[] = [
 ];
 
 const Home = ({ pageProps }: Props) => {
+  const router = useRouter();
+  const { query, pathname } = router;
   const { token, refreshToken } = pageProps;
 
   const dispatch = useAppDispatch();
-  const { data, pending, error } = useAppSelector(selectAuth);
+  const { data } = useAppSelector(selectAuth);
   // daily-data
   const { dailyReport } = useAppSelector(selectDailyManagement);
   // chart-report
@@ -102,6 +114,10 @@ const Home = ({ pageProps }: Props) => {
   const { arrivals } = useAppSelector(selectArrivalManagement);
   // chart-peekTime
   const { peakTimes } = useAppSelector(selectPeakTimeManagement);
+  // table-parking
+  const { parkings, duration, pending } = useAppSelector(
+    selectParkingManagement
+  );
 
   const [isSelected, setIsSelected] = useState<OptionProps | any>(
     dropdownOption[0]
@@ -109,6 +125,170 @@ const Home = ({ pageProps }: Props) => {
 
   const [arrivalChart, setArrivalChart] = useState<any[] | any>([]);
   const [peakTimeChart, setPeakTimeChart] = useState<any[] | any>([]);
+
+  // data-table
+  const [pages, setPages] = useState<number>(1);
+  const [limit, setLimit] = useState<number>(10);
+  const [total, setTotal] = useState<number>(0);
+  const [pageCount, setPageCount] = useState<number>(0);
+
+  const [dataTable, setDataTable] = useState<ParkingProps[] | any[]>([]);
+  const [isSelectedTable, setIsSelectedTable] = useState<
+    ParkingProps[] | any[]
+  >([]);
+  const [loading, setLoading] = useState<false>(false);
+
+  // data-table
+  useEffect(() => {
+    if (query?.page) setPages(Number(query?.page) || 1);
+    if (query?.limit) setLimit(Number(query?.limit) || 10);
+  }, [query?.page, query?.limit]);
+
+  useEffect(() => {
+    let qr: any = {
+      page: pages,
+      limit: limit,
+    };
+
+    router.replace({ pathname, query: qr });
+  }, [pages, limit]);
+
+  const filterTable = useMemo(() => {
+    const qb = RequestQueryBuilder.create();
+
+    const search = {
+      $and: [],
+    };
+
+    if (query?.page) qb.setPage(Number(query?.page) || 1);
+    if (query?.limit) qb.setLimit(Number(query?.limit) || 10);
+
+    qb.search(search);
+    qb.sortBy({
+      field: `updatedAt`,
+      order: "DESC",
+    });
+    qb.query();
+    return qb;
+  }, [query?.page, query?.limit]);
+
+  useEffect(() => {
+    if (token) {
+      dispatch(getParkings({ token, params: filterTable?.queryObject }));
+    }
+  }, [token, filterTable]);
+
+  useEffect(() => {
+    const newArr: ParkingProps[] | any[] = [];
+    let newPageCount: number | any = 0;
+    let newTotal: number | any = 0;
+    const { data, pageCount, total } = parkings;
+    if (data && data?.length > 0) {
+      data?.map((item: any) => {
+        newArr.push(item);
+      });
+      newPageCount = pageCount;
+      newTotal = total;
+    }
+    setDataTable(newArr);
+    setPageCount(newPageCount);
+    setTotal(newTotal);
+  }, [parkings]);
+
+  // column
+  const columns = useMemo<ColumnDef<ParkingProps, any>[]>(
+    () => [
+      {
+        accessorKey: "rfidNumber",
+        header: (info) => <div className="uppercase">RFID</div>,
+        cell: ({ getValue, row }) => {
+          return <div>{getValue() || "-"}</div>;
+        },
+        footer: (props) => props.column.id,
+        enableColumnFilter: false,
+      },
+      {
+        accessorKey: "employeeName",
+        cell: ({ row, getValue }) => {
+          const { guestName, rfidType } = row?.original;
+          if (rfidType == "guest") {
+            return <div>{guestName || "-"}</div>;
+          } else {
+            return <div>{getValue() || "-"}</div>;
+          }
+        },
+        header: (props) => (
+          <div className="w-full text-left uppercase">User</div>
+        ),
+        footer: (props) => props.column.id,
+        enableColumnFilter: false,
+        size: 150,
+      },
+      {
+        accessorKey: "rfidType",
+        cell: ({ row, getValue }) => {
+          return <div>{getValue() || "-"}</div>;
+        },
+        header: (props) => (
+          <div className="w-full text-left uppercase">Type</div>
+        ),
+        footer: (props) => props.column.id,
+        enableColumnFilter: false,
+        size: 150,
+      },
+      {
+        accessorKey: "duration",
+        cell: ({ row, getValue }) => {
+          const { rfidType } = row?.original;
+          let guest = duration?.guest;
+          let employee = duration?.employee;
+          let filterEmployee = getValue() > employee;
+          let filterGuest = getValue() > guest;
+          console.log(filterGuest, "duration-result");
+          if (rfidType == "guest") {
+            return (
+              <div
+                className={`flex items-center gap-2${
+                  filterGuest ? " text-danger" : ""
+                }`}>
+                <span>{getValue() || "-"}</span>
+                <MdWarning
+                  className={`w-4 h-4${filterGuest ? "" : " hidden"}`}
+                />
+              </div>
+            );
+          } else {
+            return (
+              <div
+                className={`flex items-center gap-2${
+                  filterEmployee ? " text-danger" : ""
+                }`}>
+                <span>{getValue() || "-"}</span>
+                <MdWarning
+                  className={`w-4 h-4${filterGuest ? "" : " hidden"}`}
+                />
+              </div>
+            );
+          }
+        },
+        header: (props) => (
+          <div className="w-full text-left uppercase">Duration</div>
+        ),
+        footer: (props) => props.column.id,
+        enableColumnFilter: false,
+        size: 150,
+      },
+    ],
+    [duration]
+  );
+
+  useEffect(() => {
+    if (token) {
+      dispatch(getDuration({ token, params: "" }));
+    }
+  }, [token]);
+  console.log(duration, "data-table");
+  // end-table
 
   // weekly & monthly report
   const filters = useMemo(() => {
@@ -123,6 +303,7 @@ const Home = ({ pageProps }: Props) => {
       dispatch(getReports({ token, params: filters }));
     }
   }, [token, filters]);
+  // end-report
 
   // weekly & monthly arrival
   useEffect(() => {
@@ -415,25 +596,6 @@ const Home = ({ pageProps }: Props) => {
     };
   }, [dailyReport]);
 
-  console.log(dailyReport, "today-report");
-  // end-daily
-
-  useEffect(() => {
-    if (!token) {
-      return;
-    }
-    dispatch(
-      getAuthMe({
-        token,
-        callback: () => {
-          deleteCookie("accessToken");
-          deleteCookie("refreshToken");
-          deleteCookie("roles");
-        },
-      })
-    );
-  }, [token]);
-
   let doughnutData = {
     labels: ["Employee", "Guest"],
     datasets: [
@@ -551,6 +713,23 @@ const Home = ({ pageProps }: Props) => {
       },
     },
   };
+  // end-daily
+
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+    dispatch(
+      getAuthMe({
+        token,
+        callback: () => {
+          deleteCookie("accessToken");
+          deleteCookie("refreshToken");
+          deleteCookie("roles");
+        },
+      })
+    );
+  }, [token]);
 
   const averageReports = useMemo(() => {
     let result =
@@ -693,7 +872,7 @@ const Home = ({ pageProps }: Props) => {
           </div>
 
           <div className="w-full">
-            <div className="w-full bg-white shadow-md text-gray-6 font-thin text-sm sm:text-base border border-gray p-4 rounded-lg">
+            <div className="w-full bg-white shadow-md text-gray-6 font-thin text-sm sm:text-base border border-gray p-4 rounded-t-lg">
               <h3 className="p-4 border-b border-gray text-lg lg:text-2xl font-semibold">
                 Today Report
               </h3>
@@ -843,6 +1022,23 @@ const Home = ({ pageProps }: Props) => {
                   })}
                 </div>
               </div>
+            </div>
+
+            <div className="w-full bg-white shadow-md text-gray-6 font-thin text-sm sm:text-base border border-gray p-4 rounded-b-lg">
+              <SelectTables
+                loading={loading}
+                setLoading={setLoading}
+                pages={pages}
+                setPages={setPages}
+                limit={limit}
+                setLimit={setLimit}
+                pageCount={pageCount}
+                columns={columns}
+                dataTable={dataTable}
+                total={total}
+                setIsSelected={setIsSelectedTable}
+                classTable=""
+              />
             </div>
           </div>
         </div>

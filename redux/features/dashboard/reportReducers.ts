@@ -84,7 +84,7 @@ export const getReports = createAsyncThunk<
     let newError: any = { message: data.message[0] };
     toast.dark(newError.message);
     if (error.response && error.response.status === 404) {
-      throw new Error("rfid not found");
+      throw new Error("report not found");
     } else {
       throw new Error(newError.message);
     }
@@ -117,7 +117,7 @@ export const getReportById = createAsyncThunk<
     let newError: any = { message: data.message[0] };
     toast.dark(newError.message);
     if (error.response && error.response.status === 404) {
-      throw new Error("rfid not found");
+      throw new Error("report not found");
     } else {
       throw new Error(newError.message);
     }

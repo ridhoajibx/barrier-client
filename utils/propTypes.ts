@@ -45,3 +45,20 @@ export interface RfidLogProps {
   departure?: string | any;
   rfid?: string | any;
 }
+
+export interface ParkingProps {
+  id?: number | string | any;
+  createdAt?: string | any;
+  rfidNumber?: string | any;
+  rfidType?: string | any;
+  employeeName?: string | any;
+  employeeVehicle?: string | any;
+  employeeLicencePlate?: string | any;
+  guestName?: string | any;
+  guestVehicle?: string | any;
+  guestLicencePlate?: string | any;
+  arrival?: string | any;
+  departure?: string | any;
+  rfid?: RfidProps;
+  duration?: string | any;
+}
