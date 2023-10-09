@@ -287,7 +287,6 @@ const Home = ({ pageProps }: Props) => {
       dispatch(getDuration({ token, params: "" }));
     }
   }, [token]);
-  console.log(duration, "data-table");
   // end-table
 
   // weekly & monthly report
