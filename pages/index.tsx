@@ -871,159 +871,165 @@ const Home = ({ pageProps }: Props) => {
           </div>
 
           <div className="w-full">
-            <div className="w-full bg-white shadow-md text-gray-6 font-thin text-sm sm:text-base border border-gray p-4 rounded-t-lg">
-              <h3 className="p-4 border-b border-gray text-lg lg:text-2xl font-semibold">
-                Today Report
-              </h3>
-              <div className="w-full bg-white p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-4 border-b border-gray">
-                <div className="w-full p-2 text-sm">
-                  <h3 className="text-xs lg:text-sm text-gray-5">
-                    Weekly Arrival
-                  </h3>
-                  <div className="w-full flex items-center gap-1">
-                    <span>
-                      <MdOutlineDirectionsCarFilled className="w-6 h-6 text-primary" />
-                    </span>
-                    <div className="flex gap-1 items-center">
-                      <span className="font-bold">
-                        {dailyReport?.total || 0}
-                      </span>
+            <div className="w-full bg-white shadow-md text-gray-6 font-thin text-sm sm:text-base border border-gray rounded-t-lg">
+              <div className="w-full p-4">
+                <h3 className="p-4 border-b border-gray text-lg lg:text-2xl font-semibold">
+                  Today Report
+                </h3>
+                <div className="w-full bg-white p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-4 border-b border-gray">
+                  <div className="w-full p-2 text-sm">
+                    <h3 className="text-xs lg:text-sm text-gray-5">
+                      Weekly Arrival
+                    </h3>
+                    <div className="w-full flex items-center gap-1">
                       <span>
-                        {dailyReport?.total > 1 ? "Vehicles" : "Vehicle"}
+                        <MdOutlineDirectionsCarFilled className="w-6 h-6 text-primary" />
                       </span>
+                      <div className="flex gap-1 items-center">
+                        <span className="font-bold">
+                          {dailyReport?.total || 0}
+                        </span>
+                        <span>
+                          {dailyReport?.total > 1 ? "Vehicles" : "Vehicle"}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="w-full p-2 text-sm">
-                  <h3 className="text-xs lg:text-sm text-gray-5">Employee</h3>
-                  <div className="w-full flex items-center gap-1">
-                    <span>
-                      <MdPeople className="w-6 h-6 text-primary" />
-                    </span>
-                    <div className="flex gap-1 items-center">
-                      <span className="font-bold">
-                        {dailyReport?.employee || 0}
-                      </span>
+                  <div className="w-full p-2 text-sm">
+                    <h3 className="text-xs lg:text-sm text-gray-5">Employee</h3>
+                    <div className="w-full flex items-center gap-1">
                       <span>
-                        {dailyReport?.employee > 1 ? "People" : "Person"}
+                        <MdPeople className="w-6 h-6 text-primary" />
                       </span>
+                      <div className="flex gap-1 items-center">
+                        <span className="font-bold">
+                          {dailyReport?.employee || 0}
+                        </span>
+                        <span>
+                          {dailyReport?.employee > 1 ? "People" : "Person"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-full p-2 text-sm">
+                    <h3 className="text-xs lg:text-sm text-gray-5">Guest</h3>
+                    <div className="w-full flex items-center gap-1">
+                      <span>
+                        <MdCardMembership className="w-6 h-6 text-primary" />
+                      </span>
+                      <div className="flex gap-1 items-center">
+                        <span className="font-bold">
+                          {dailyReport?.guest || 0}
+                        </span>
+                        <span>{dailyReport?.guest > 1 ? "Areas" : "Area"}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="w-full p-2 text-sm">
-                  <h3 className="text-xs lg:text-sm text-gray-5">Guest</h3>
-                  <div className="w-full flex items-center gap-1">
-                    <span>
-                      <MdCardMembership className="w-6 h-6 text-primary" />
-                    </span>
-                    <div className="flex gap-1 items-center">
-                      <span className="font-bold">
-                        {dailyReport?.guest || 0}
-                      </span>
-                      <span>{dailyReport?.guest > 1 ? "Areas" : "Area"}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
-              <h3 className="text-lg p-4">Employee / Guest</h3>
-              <div className="w-full flex items-center gap-2">
-                <div className="w-2/3">
-                  <Doughnutcharts
-                    data={isShowTodayReport || doughnutData}
-                    options={doughnutOptions}
-                    className="w-full max-w-max"
-                    height="300px"
-                  />
-                </div>
-                <div className="w-1/3">
-                  {isShowTodayReport?.datasets?.map((chart, index) => {
-                    return (
-                      <div key={index} className="flex flex-col gap-2">
-                        <div className="w-full flex items-center gap-2 text-left">
-                          <div
-                            style={{
-                              borderColor: chart.borderColor[0],
-                              backgroundColor: chart.backgroundColor[0],
-                            }}
-                            className="w-1.5 h-14 border rounded-sm"></div>
-                          <div>
-                            <p className="text-sm">{doughnutData?.labels[0]}</p>
-                            <p className="text-sm font-semibold">
-                              {`${
-                                valueDoughnut({
+                <h3 className="text-lg p-4">Employee / Guest</h3>
+                <div className="w-full flex items-center gap-2">
+                  <div className="w-2/3">
+                    <Doughnutcharts
+                      data={isShowTodayReport || doughnutData}
+                      options={doughnutOptions}
+                      className="w-full max-w-max"
+                      height="300px"
+                    />
+                  </div>
+                  <div className="w-1/3">
+                    {isShowTodayReport?.datasets?.map((chart, index) => {
+                      return (
+                        <div key={index} className="flex flex-col gap-2">
+                          <div className="w-full flex items-center gap-2 text-left">
+                            <div
+                              style={{
+                                borderColor: chart.borderColor[0],
+                                backgroundColor: chart.backgroundColor[0],
+                              }}
+                              className="w-1.5 h-14 border rounded-sm"></div>
+                            <div>
+                              <p className="text-sm">
+                                {doughnutData?.labels[0]}
+                              </p>
+                              <p className="text-sm font-semibold">
+                                {`${
+                                  valueDoughnut({
+                                    data: chart?.data,
+                                    index: 0,
+                                  }).percent
+                                }%`}
+                              </p>
+                              <p className="text-xs font-semibold text-gray-5">
+                                {valueDoughnut({
                                   data: chart?.data,
                                   index: 0,
-                                }).percent
-                              }%`}
-                            </p>
-                            <p className="text-xs font-semibold text-gray-5">
-                              {valueDoughnut({
-                                data: chart?.data,
-                                index: 0,
-                              }).value > 1
-                                ? `${
-                                    valueDoughnut({
-                                      data: chart?.data,
-                                      index: 0,
-                                    }).value
-                                  } people`
-                                : `${
-                                    valueDoughnut({
-                                      data: chart?.data,
-                                      index: 0,
-                                    }).value
-                                  } person`}
-                            </p>
+                                }).value > 1
+                                  ? `${
+                                      valueDoughnut({
+                                        data: chart?.data,
+                                        index: 0,
+                                      }).value
+                                    } people`
+                                  : `${
+                                      valueDoughnut({
+                                        data: chart?.data,
+                                        index: 0,
+                                      }).value
+                                    } person`}
+                              </p>
+                            </div>
                           </div>
-                        </div>
 
-                        <div className="w-full flex items-center gap-2">
-                          <div
-                            style={{
-                              borderColor: chart.borderColor[1],
-                              backgroundColor: chart.backgroundColor[1],
-                            }}
-                            className="w-1.5 h-14 border rounded-sm"></div>
+                          <div className="w-full flex items-center gap-2">
+                            <div
+                              style={{
+                                borderColor: chart.borderColor[1],
+                                backgroundColor: chart.backgroundColor[1],
+                              }}
+                              className="w-1.5 h-14 border rounded-sm"></div>
 
-                          <div>
-                            <p className="text-sm">{doughnutData?.labels[1]}</p>
-                            <p className="text-sm font-semibold">
-                              {`${
-                                valueDoughnut({
+                            <div>
+                              <p className="text-sm">
+                                {doughnutData?.labels[1]}
+                              </p>
+                              <p className="text-sm font-semibold">
+                                {`${
+                                  valueDoughnut({
+                                    data: chart?.data,
+                                    index: 1,
+                                  }).percent
+                                }%`}
+                              </p>
+                              <p className="text-xs font-semibold text-gray-5">
+                                {valueDoughnut({
                                   data: chart?.data,
                                   index: 1,
-                                }).percent
-                              }%`}
-                            </p>
-                            <p className="text-xs font-semibold text-gray-5">
-                              {valueDoughnut({
-                                data: chart?.data,
-                                index: 1,
-                              }).value > 1
-                                ? `${
-                                    valueDoughnut({
-                                      data: chart?.data,
-                                      index: 1,
-                                    }).value
-                                  } areas`
-                                : `${
-                                    valueDoughnut({
-                                      data: chart?.data,
-                                      index: 1,
-                                    }).value
-                                  } area`}
-                            </p>
+                                }).value > 1
+                                  ? `${
+                                      valueDoughnut({
+                                        data: chart?.data,
+                                        index: 1,
+                                      }).value
+                                    } areas`
+                                  : `${
+                                      valueDoughnut({
+                                        data: chart?.data,
+                                        index: 1,
+                                      }).value
+                                    } area`}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="w-full bg-white shadow-md text-gray-6 font-thin text-sm sm:text-base border border-gray p-4 rounded-b-lg">
+            <div className="w-full bg-white shadow-md text-gray-6 font-thin text-sm sm:text-base border border-gray rounded-b-lg">
               <SelectTables
                 loading={loading}
                 setLoading={setLoading}
