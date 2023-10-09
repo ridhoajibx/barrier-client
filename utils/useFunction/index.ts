@@ -63,12 +63,12 @@ export const formatMoney = ({
 };
 
 export const sortByArr = (fn: any, sortBy: boolean) => {
-  // console.log(sortBy, 'sort')
   function cmp(a: any, b: any) {
     if (sortBy) return -(a < b) || +(a > b);
     else return -(a > b) || +(a < b);
   }
   return function (a: any, b: any) {
+    // console.log(fn(a), "sort");
     return cmp(fn(a), fn(b));
   };
 };

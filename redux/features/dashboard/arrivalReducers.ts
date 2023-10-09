@@ -10,18 +10,16 @@ import type { RootState } from "../../store";
 
 // here we are typing the types for the state
 export type MainState = {
-  monthlyReport: any;
-  monthlyArrival: any;
-  monthlyPeakTime: any;
+  arrivals: any[];
+  arrival: any;
   pending: boolean;
   error: boolean;
   message: any;
 };
 
 const initialState: MainState = {
-  monthlyReport: {},
-  monthlyArrival: {},
-  monthlyPeakTime: {},
+  arrivals: [],
+  arrival: {},
   pending: false,
   error: false,
   message: "",
@@ -36,11 +34,12 @@ interface HeadersConfiguration {
   };
 }
 
-interface RfidData {
+interface ArrivalData {
   id?: any;
   data?: any;
   token?: any;
   isSuccess: () => void;
+  isError: () => void;
 }
 
 interface DefaultGetData {
@@ -59,11 +58,11 @@ function isRejectedAction(action: AnyAction): action is RejectedAction {
 }
 
 // get all report
-export const getMonthlyReport = createAsyncThunk<
+export const getArrivals = createAsyncThunk<
   any,
   DefaultGetData,
   { state: RootState }
->("dashboard/monthly/report", async (params, { getState }) => {
+>("dashboard/arrival", async (params, { getState }) => {
   let config: HeadersConfiguration = {
     params: params.params,
     headers: {
@@ -73,7 +72,7 @@ export const getMonthlyReport = createAsyncThunk<
     },
   };
   try {
-    const response = await axios.get("dashboard/monthly/report", config);
+    const response = await axios.get("dashboard/arrival", config);
     const { data, status } = response;
     if (status == 200) {
       return data;
@@ -92,11 +91,11 @@ export const getMonthlyReport = createAsyncThunk<
   }
 });
 
-export const getMonthlyArrival = createAsyncThunk<
+export const getArrivalById = createAsyncThunk<
   any,
   DefaultGetData,
   { state: RootState }
->("dashboard/monthly/arrival", async (params, { getState }) => {
+>("dashboard/arrival/id", async (params, { getState }) => {
   let config: HeadersConfiguration = {
     params: params.params,
     headers: {
@@ -106,40 +105,7 @@ export const getMonthlyArrival = createAsyncThunk<
     },
   };
   try {
-    const response = await axios.get("dashboard/monthly/arrival", config);
-    const { data, status } = response;
-    if (status == 200) {
-      return data;
-    } else {
-      throw response;
-    }
-  } catch (error: any) {
-    const { data, status } = error.response;
-    let newError: any = { message: data.message[0] };
-    toast.dark(newError.message);
-    if (error.response && error.response.status === 404) {
-      throw new Error("rfid not found");
-    } else {
-      throw new Error(newError.message);
-    }
-  }
-});
-
-export const getMonthlyPeekTime = createAsyncThunk<
-  any,
-  DefaultGetData,
-  { state: RootState }
->("dashboard/monthly/peekTime", async (params, { getState }) => {
-  let config: HeadersConfiguration = {
-    params: params.params,
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${params.token}`,
-    },
-  };
-  try {
-    const response = await axios.get("dashboard/monthly/peekTime", config);
+    const response = await axios.get(`dashboard/arrival/${params.id}`, config);
     const { data, status } = response;
     if (status == 200) {
       return data;
@@ -159,27 +125,20 @@ export const getMonthlyPeekTime = createAsyncThunk<
 });
 
 // SLICER
-export const monthlySlice = createSlice({
-  name: "monthly",
+export const arrivalSlice = createSlice({
+  name: "arrival",
   initialState,
   reducers: {
     // leave this empty here
-    resetMonthlyReport(state) {
-      state.monthlyReport = {};
+    resetArrivals(state) {
+      state.arrivals = [];
       state.pending = false;
       state.error = false;
       state.message = "";
     },
 
-    resetMonthlyArrival(state) {
-      state.monthlyArrival = {};
-      state.pending = false;
-      state.error = false;
-      state.message = "";
-    },
-
-    resetMonthlyPeekTime(state) {
-      state.monthlyPeakTime = {};
+    resetArrival(state) {
+      state.arrival = {};
       state.pending = false;
       state.error = false;
       state.message = "";
@@ -191,63 +150,42 @@ export const monthlySlice = createSlice({
   extraReducers: (builder) => {
     builder
       // get-report
-      .addCase(getMonthlyReport.pending, (state) => {
+      .addCase(getArrivals.pending, (state) => {
         return {
           ...state,
           pending: true,
         };
       })
-      .addCase(getMonthlyReport.fulfilled, (state, { payload }) => {
+      .addCase(getArrivals.fulfilled, (state, { payload }) => {
         return {
           ...state,
           pending: false,
           error: false,
-          monthlyReport: payload,
+          arrivals: payload,
         };
       })
-      .addCase(getMonthlyReport.rejected, (state, { error }) => {
+      .addCase(getArrivals.rejected, (state, { error }) => {
         state.pending = false;
         state.error = true;
         state.message = error.message;
       })
 
       // get-arrival
-      .addCase(getMonthlyArrival.pending, (state) => {
+      .addCase(getArrivalById.pending, (state) => {
         return {
           ...state,
           pending: true,
         };
       })
-      .addCase(getMonthlyArrival.fulfilled, (state, { payload }) => {
+      .addCase(getArrivalById.fulfilled, (state, { payload }) => {
         return {
           ...state,
           pending: false,
           error: false,
-          monthlyArrival: payload,
+          arrival: payload,
         };
       })
-      .addCase(getMonthlyArrival.rejected, (state, { error }) => {
-        state.pending = false;
-        state.error = true;
-        state.message = error.message;
-      })
-
-      // get-report
-      .addCase(getMonthlyPeekTime.pending, (state) => {
-        return {
-          ...state,
-          pending: true,
-        };
-      })
-      .addCase(getMonthlyPeekTime.fulfilled, (state, { payload }) => {
-        return {
-          ...state,
-          pending: false,
-          error: false,
-          monthlyPeakTime: payload,
-        };
-      })
-      .addCase(getMonthlyPeekTime.rejected, (state, { error }) => {
+      .addCase(getArrivalById.rejected, (state, { error }) => {
         state.pending = false;
         state.error = true;
         state.message = error.message;
@@ -265,11 +203,10 @@ export const monthlySlice = createSlice({
 });
 // SLICER
 
-const monthlyReducers = monthlySlice.reducer;
+const arrivalReducers = arrivalSlice.reducer;
 
-export const { resetMonthlyReport, resetMonthlyArrival, resetMonthlyPeekTime } =
-  monthlySlice.actions;
-export const selectMonthlyManagement = (state: RootState) =>
-  state.monthlyManagement;
+export const { resetArrivals, resetArrival } = arrivalSlice.actions;
+export const selectArrivalManagement = (state: RootState) =>
+  state.arrivalManagement;
 
-export default monthlyReducers;
+export default arrivalReducers;

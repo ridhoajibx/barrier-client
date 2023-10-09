@@ -10,18 +10,16 @@ import type { RootState } from "../../store";
 
 // here we are typing the types for the state
 export type MainState = {
-  weeklyReport: any;
-  weeklyArrival: any;
-  weeklyPeakTime: any;
+  reports: any;
+  report: any;
   pending: boolean;
   error: boolean;
   message: any;
 };
 
 const initialState: MainState = {
-  weeklyReport: {},
-  weeklyArrival: {},
-  weeklyPeakTime: {},
+  reports: {},
+  report: {},
   pending: false,
   error: false,
   message: "",
@@ -36,11 +34,12 @@ interface HeadersConfiguration {
   };
 }
 
-interface RfidData {
+interface ReportData {
   id?: any;
   data?: any;
   token?: any;
   isSuccess: () => void;
+  isError: () => void;
 }
 
 interface DefaultGetData {
@@ -59,11 +58,11 @@ function isRejectedAction(action: AnyAction): action is RejectedAction {
 }
 
 // get all report
-export const getWeeklyReport = createAsyncThunk<
+export const getReports = createAsyncThunk<
   any,
   DefaultGetData,
   { state: RootState }
->("dashboard/weekly/report", async (params, { getState }) => {
+>("dashboard/report", async (params, { getState }) => {
   let config: HeadersConfiguration = {
     params: params.params,
     headers: {
@@ -73,7 +72,7 @@ export const getWeeklyReport = createAsyncThunk<
     },
   };
   try {
-    const response = await axios.get("dashboard/weekly/report", config);
+    const response = await axios.get("dashboard/report", config);
     const { data, status } = response;
     if (status == 200) {
       return data;
@@ -92,11 +91,11 @@ export const getWeeklyReport = createAsyncThunk<
   }
 });
 
-export const getWeeklyArrival = createAsyncThunk<
+export const getReportById = createAsyncThunk<
   any,
   DefaultGetData,
   { state: RootState }
->("dashboard/weekly/arrival", async (params, { getState }) => {
+>("dashboard/report/id", async (params, { getState }) => {
   let config: HeadersConfiguration = {
     params: params.params,
     headers: {
@@ -106,40 +105,7 @@ export const getWeeklyArrival = createAsyncThunk<
     },
   };
   try {
-    const response = await axios.get("dashboard/weekly/arrival", config);
-    const { data, status } = response;
-    if (status == 200) {
-      return data;
-    } else {
-      throw response;
-    }
-  } catch (error: any) {
-    const { data, status } = error.response;
-    let newError: any = { message: data.message[0] };
-    toast.dark(newError.message);
-    if (error.response && error.response.status === 404) {
-      throw new Error("rfid not found");
-    } else {
-      throw new Error(newError.message);
-    }
-  }
-});
-
-export const getWeeklyPeekTime = createAsyncThunk<
-  any,
-  DefaultGetData,
-  { state: RootState }
->("dashboard/weekly/peekTime", async (params, { getState }) => {
-  let config: HeadersConfiguration = {
-    params: params.params,
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${params.token}`,
-    },
-  };
-  try {
-    const response = await axios.get("dashboard/weekly/peekTime", config);
+    const response = await axios.get(`dashboard/report/${params.id}`, config);
     const { data, status } = response;
     if (status == 200) {
       return data;
@@ -159,27 +125,20 @@ export const getWeeklyPeekTime = createAsyncThunk<
 });
 
 // SLICER
-export const weeklySlice = createSlice({
-  name: "weekly",
+export const reportSlice = createSlice({
+  name: "report",
   initialState,
   reducers: {
     // leave this empty here
-    resetWeeklyReport(state) {
-      state.weeklyReport = {};
+    resetReports(state) {
+      state.reports = {};
       state.pending = false;
       state.error = false;
       state.message = "";
     },
 
-    resetWeeklyArrival(state) {
-      state.weeklyArrival = {};
-      state.pending = false;
-      state.error = false;
-      state.message = "";
-    },
-
-    resetWeeklyPeekTime(state) {
-      state.weeklyPeakTime = {};
+    resetReport(state) {
+      state.report = {};
       state.pending = false;
       state.error = false;
       state.message = "";
@@ -190,64 +149,43 @@ export const weeklySlice = createSlice({
   // Doing this is good practice as we can tap into the status of the API call and give our rfids an idea of what's happening in the background.
   extraReducers: (builder) => {
     builder
-      // get-report
-      .addCase(getWeeklyReport.pending, (state) => {
+      // get-reports
+      .addCase(getReports.pending, (state) => {
         return {
           ...state,
           pending: true,
         };
       })
-      .addCase(getWeeklyReport.fulfilled, (state, { payload }) => {
+      .addCase(getReports.fulfilled, (state, { payload }) => {
         return {
           ...state,
           pending: false,
           error: false,
-          weeklyReport: payload,
+          reports: payload,
         };
       })
-      .addCase(getWeeklyReport.rejected, (state, { error }) => {
+      .addCase(getReports.rejected, (state, { error }) => {
         state.pending = false;
         state.error = true;
         state.message = error.message;
       })
 
-      // get-arrival
-      .addCase(getWeeklyArrival.pending, (state) => {
+      // get-report-by-id
+      .addCase(getReportById.pending, (state) => {
         return {
           ...state,
           pending: true,
         };
       })
-      .addCase(getWeeklyArrival.fulfilled, (state, { payload }) => {
+      .addCase(getReportById.fulfilled, (state, { payload }) => {
         return {
           ...state,
           pending: false,
           error: false,
-          weeklyArrival: payload,
+          report: payload,
         };
       })
-      .addCase(getWeeklyArrival.rejected, (state, { error }) => {
-        state.pending = false;
-        state.error = true;
-        state.message = error.message;
-      })
-
-      // get-report
-      .addCase(getWeeklyPeekTime.pending, (state) => {
-        return {
-          ...state,
-          pending: true,
-        };
-      })
-      .addCase(getWeeklyPeekTime.fulfilled, (state, { payload }) => {
-        return {
-          ...state,
-          pending: false,
-          error: false,
-          weeklyPeakTime: payload,
-        };
-      })
-      .addCase(getWeeklyPeekTime.rejected, (state, { error }) => {
+      .addCase(getReportById.rejected, (state, { error }) => {
         state.pending = false;
         state.error = true;
         state.message = error.message;
@@ -265,11 +203,10 @@ export const weeklySlice = createSlice({
 });
 // SLICER
 
-const weeklyReducers = weeklySlice.reducer;
+const reportReducers = reportSlice.reducer;
 
-export const { resetWeeklyReport, resetWeeklyArrival, resetWeeklyPeekTime } =
-  weeklySlice.actions;
-export const selectWeeklyManagement = (state: RootState) =>
-  state.weeklyManagement;
+export const { resetReports, resetReport } = reportSlice.actions;
+export const selectReportManagement = (state: RootState) =>
+  state.reportManagement;
 
-export default weeklyReducers;
+export default reportReducers;

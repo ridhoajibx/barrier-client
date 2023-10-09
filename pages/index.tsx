@@ -10,17 +10,66 @@ import { GetServerSideProps } from "next";
 import { deleteCookie, getCookies } from "cookies-next";
 import { useAppDispatch, useAppSelector } from "@/redux/Hooks";
 import { getAuthMe, selectAuth } from "@/redux/features/AuthenticationReducers";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Doughnutcharts from "@/components/chart/Doughnutcharts";
 import AreaChart from "@/components/chart/AreaChart";
 import Navbar from "@/components/layouts/header/Navbar";
 import { selectDailyManagement } from "@/redux/features/dashboard/dailyReducers";
+import {
+  getReports,
+  selectReportManagement,
+} from "@/redux/features/dashboard/reportReducers";
+import {
+  getArrivals,
+  selectArrivalManagement,
+} from "@/redux/features/dashboard/arrivalReducers";
+import {
+  getPeekTimes,
+  selectpeekTimeManagement,
+} from "@/redux/features/dashboard/peekTimeReducers";
+import { OptionProps } from "@/utils/propTypes";
+import DropdownSelect from "@/components/dropdown/DropdownSelect";
+import Barcharts from "@/components/chart/Barcharts";
+import { sortByArr } from "@/utils/useFunction";
+import moment from "moment";
 
 const inter = Inter({ subsets: ["latin"] });
 
-interface LegendVisibility {
-  [key: string]: boolean;
-}
+const stylesSelect = {
+  indicatorSeparator: (provided: any) => ({
+    ...provided,
+    display: "none",
+  }),
+  dropdownIndicator: (provided: any) => {
+    return {
+      ...provided,
+      color: "#7B8C9E",
+    };
+  },
+  clearIndicator: (provided: any) => {
+    return {
+      ...provided,
+      color: "#7B8C9E",
+    };
+  },
+  singleValue: (provided: any) => {
+    return {
+      ...provided,
+      color: "#333",
+    };
+  },
+  control: (provided: any, state: any) => {
+    return {
+      ...provided,
+      background: "transparent",
+      padding: ".2rem",
+      border: "0px",
+      borderRadius: ".5rem",
+      minHeight: 20,
+    };
+  },
+  menuList: (provided: any) => provided,
+};
 
 interface PageProps {
   page: string;
@@ -32,6 +81,11 @@ type Props = {
   pageProps: PageProps;
 };
 
+const dropdownOption: OptionProps[] = [
+  { value: "weekly", label: "Weekly Report" },
+  { value: "monthly", label: "Monthly Report" },
+];
+
 const Home = ({ pageProps }: Props) => {
   const { token, refreshToken } = pageProps;
 
@@ -39,25 +93,110 @@ const Home = ({ pageProps }: Props) => {
   const { data, pending, error } = useAppSelector(selectAuth);
   // daily-data
   const { dailyReport } = useAppSelector(selectDailyManagement);
-  console.log(data, "data-auth");
+  // chart-report
+  const { reports } = useAppSelector(selectReportManagement);
+  // chart-arrival
+  const { arrivals } = useAppSelector(selectArrivalManagement);
+  // chart-peekTime
+  const { peekTimes } = useAppSelector(selectpeekTimeManagement);
+
+  const [isSelected, setIsSelected] = useState<OptionProps | any>(
+    dropdownOption[0]
+  );
+
+  const [arrivalChart, setArrivalChart] = useState<any[] | any>([]);
+  const [peekTimeChart, setPeekTimeChart] = useState<any[] | any>([]);
+
+  // weekly & monthly report
+  const filters = useMemo(() => {
+    let params: any = {
+      type: isSelected?.value,
+    };
+    return params;
+  }, [isSelected]);
 
   useEffect(() => {
-    if (!token) {
-      return;
+    if (token) {
+      dispatch(getReports({ token, params: filters }));
     }
-    dispatch(
-      getAuthMe({
-        token,
-        callback: () => {
-          deleteCookie("accessToken");
-          deleteCookie("refreshToken");
-          deleteCookie("roles");
-        },
-      })
-    );
-  }, [token]);
+  }, [token, filters]);
 
-  // chart
+  // weekly & monthly arrival
+  useEffect(() => {
+    if (token) {
+      dispatch(getArrivals({ token, params: filters }));
+    }
+  }, [token, filters]);
+
+  useEffect(() => {
+    let newArr: any[] = [];
+    if (arrivals?.length > 0) {
+      arrivals?.map((item: any) => {
+        newArr.push({
+          ...item,
+          date: item?.date
+            ? moment(new Date(item?.date)).format("MM/DD/YYYY")
+            : "",
+        });
+      });
+    }
+
+    setArrivalChart(newArr);
+  }, [arrivals]);
+
+  const isSortChartArrival = useMemo(() => {
+    const getDate = (o: any) => {
+      return o?.date;
+    };
+    let sortByDate = sortByArr(getDate, true);
+    let sort = arrivalChart?.length > 0 && arrivalChart.sort(sortByDate);
+    return sort;
+  }, [arrivalChart]);
+
+  const isShowChartArrival = useMemo(() => {
+    let labels: any[] = [];
+    let employee: any = {};
+    let guest: any = {};
+    let dataEmployee: any[] = [];
+    let dataGuest: any[] = [];
+    let datasets: any[] = [];
+    if (isSortChartArrival?.length > 0) {
+      isSortChartArrival?.map((item: any) => {
+        let newDate =
+          isSelected?.value == "weekly"
+            ? moment(new Date(item.date)).format("dddd")
+            : item.date;
+        labels.push(newDate);
+        dataEmployee.push(item.data.employee);
+        dataGuest.push(item.data.guest);
+      });
+    }
+    employee = {
+      fill: true,
+      label: "Employee",
+      borderRadius: 0,
+      data: dataEmployee || [12, 44, 23, 33, 22, 54, 73],
+      borderColor: "rgb(53, 162, 235)",
+      backgroundColor: "rgba(53, 162, 235, 0.3)",
+      tension: 0.4,
+    };
+    guest = {
+      fill: true,
+      label: "Guest",
+      borderRadius: 0,
+      data: dataGuest,
+      borderColor: "#FF8859",
+      backgroundColor: "rgba(255, 136, 89, 0.5)",
+      tension: 0.4,
+    };
+    datasets = [employee, guest];
+    return {
+      labels,
+      datasets,
+    };
+  }, [isSortChartArrival, isSelected]);
+
+  // chart arrival default
   let areaData = {
     labels: [
       "Monday",
@@ -107,8 +246,9 @@ const Home = ({ pageProps }: Props) => {
         position: "top" as const,
         align: "end" as const,
         labels: {
-          boxWidth: 15,
-          usePointStyle: false,
+          borderRadius: 4,
+          boxWidth: 16,
+          useBorderRadius: true,
           pointStyle: "circle",
         },
       },
@@ -124,6 +264,33 @@ const Home = ({ pageProps }: Props) => {
       },
     },
   };
+  // end-arrivals
+
+  // get-peektime
+  useEffect(() => {
+    if (token) {
+      dispatch(getPeekTimes({ token, params: filters }));
+    }
+  }, [token, filters]);
+
+  console.log(peekTimes, "peektime-data");
+  // end peektime
+
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+    dispatch(
+      getAuthMe({
+        token,
+        callback: () => {
+          deleteCookie("accessToken");
+          deleteCookie("refreshToken");
+          deleteCookie("roles");
+        },
+      })
+    );
+  }, [token]);
 
   let barData = {
     labels: [
@@ -140,17 +307,10 @@ const Home = ({ pageProps }: Props) => {
     ],
     datasets: [
       {
-        label: "Solved",
-        borderRadius: 0,
+        label: "Peek Time",
+        borderRadius: 5,
         data: [0.1, 0.3, 0.2, 0.4, 0.7, 0.6, 0.5],
-        backgroundColor: "#52B788",
-        barThickness: 30,
-      },
-      {
-        label: "Unsolved",
-        borderRadius: 0,
-        data: [0.07, 0.3, 0.15, 0.2, 0.5, 0.3, 0.8],
-        backgroundColor: "#95D5B2",
+        backgroundColor: "rgb(53, 162, 235)",
         barThickness: 30,
       },
     ],
@@ -162,19 +322,20 @@ const Home = ({ pageProps }: Props) => {
     plugins: {
       tooltip: {
         titleFont: {
-          size: 20,
+          size: 14,
         },
         bodyFont: {
-          size: 16,
+          size: 12,
         },
       },
       legend: {
         display: true,
         position: "top",
-        align: "center",
+        align: "end",
         labels: {
-          boxWidth: 15,
-          usePointStyle: false,
+          borderRadius: 4,
+          boxWidth: 16,
+          useBorderRadius: true,
           pointStyle: "circle",
         },
       },
@@ -316,6 +477,13 @@ const Home = ({ pageProps }: Props) => {
     },
   };
 
+  const averageReports = useMemo(() => {
+    let result =
+      Math.round((reports?.employee?.average + reports?.guest?.average) / 2) ||
+      0;
+    return result;
+  }, [reports]);
+
   return (
     <DashboardLayouts
       userDefault="/images/logo.png"
@@ -323,85 +491,128 @@ const Home = ({ pageProps }: Props) => {
       refreshToken={refreshToken}
       header={"header"}
       title={"title"}>
-      <div className="relative w-full bg-gray overflow-auto">
+      <div className="relative w-full h-full bg-gray overflow-auto">
         <Navbar />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 md:p-6 2xl:p-10">
           <div className="w-full lg:col-span-2">
             <div className="w-full mb-3">
-              <button
-                type="button"
-                onClick={() => console.log("weekly")}
-                className="inline-flex p-2 text-lg lg:text-2xl font-semibold focus:outline-none gap-2 items-center">
-                <span>Weekly Report</span>
-                <MdArrowDropDown className="w-6 lg:w-8 h-6 lg:h-8" />
-              </button>
+              <div className="flex w-full max-w-[250px] mb-5">
+                <DropdownSelect
+                  customStyles={stylesSelect}
+                  value={isSelected}
+                  onChange={setIsSelected}
+                  error=""
+                  className="text-lg lg:text-2xl font-normal text-gray-5 w-full"
+                  classNamePrefix=""
+                  formatOptionLabel=""
+                  instanceId="d-1"
+                  isDisabled={false}
+                  isMulti={false}
+                  placeholder="Select ..."
+                  options={dropdownOption}
+                  icon=""
+                />
+              </div>
 
-              {/* header */}
-              <div className="w-full bg-white rounded-lg shadow-card p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-4">
-                <div className="w-full p-2">
-                  <h3 className="text-xs lg:text-sm text-gray-5">
-                    Weekly Arrival
+              {/* arrival */}
+              <div className="w-full mb-3">
+                {/* header */}
+                <div className="w-full bg-white rounded-lg shadow-card p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-4">
+                  <div className="w-full p-2">
+                    <h3 className="text-xs lg:text-sm text-gray-5">
+                      Weekly Arrival
+                    </h3>
+                    <div className="w-full flex items-center gap-1">
+                      <span>
+                        <MdOutlineDirectionsCarFilled className="w-6 h-6 text-primary" />
+                      </span>
+                      <div className="flex gap-1 items-center">
+                        <span className="font-bold text-lg">
+                          {reports?.total || 0}
+                        </span>
+                        <span>
+                          {reports?.total > 1 ? "Vehicles" : "Vehicle"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-full p-2">
+                    <h3 className="text-xs lg:text-sm text-gray-5">Employee</h3>
+                    <div className="w-full flex items-center gap-1">
+                      <span>
+                        <MdPeople className="w-6 h-6 text-primary" />
+                      </span>
+                      <div className="flex gap-1 items-center">
+                        <span className="font-bold text-lg">
+                          {reports?.employee?.total || 0}
+                        </span>
+                        <span>
+                          {reports?.guest?.total > 1 ? "People" : "Person"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-full p-2">
+                    <h3 className="text-xs lg:text-sm text-gray-5">
+                      Avarage Stay
+                    </h3>
+                    <div className="w-full flex items-center gap-1">
+                      <span>
+                        <MdCardMembership className="w-6 h-6 text-primary" />
+                      </span>
+                      <div className="flex gap-1 items-center">
+                        <span className="font-bold text-lg">
+                          {averageReports}
+                        </span>
+                        <span>Hours</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-full p-2">
+                    <h3 className="text-xs lg:text-sm text-gray-5">Guest</h3>
+                    <div className="w-full flex items-center gap-1">
+                      <span>
+                        <MdCardMembership className="w-6 h-6 text-primary" />
+                      </span>
+                      <div className="flex gap-1 items-center">
+                        <span className="font-bold text-lg">
+                          {reports?.guest?.total || 0}
+                        </span>
+                        <span>
+                          {reports?.guest?.total > 1 ? "Areas" : "Area"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="w-full p-4 bg-white rounded-lg shadow-card">
+                  <h3 className="font-thin text-lg text-gray-5">
+                    Arrival{" "}
+                    <span className="capitalize">{isSelected?.value}</span>
                   </h3>
-                  <div className="w-full flex items-center gap-1">
-                    <span>
-                      <MdOutlineDirectionsCarFilled className="w-6 h-6 text-primary" />
-                    </span>
-                    <div className="flex gap-1 items-center">
-                      <span className="font-bold text-lg">45</span>
-                      <span>Vehicles</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full p-2">
-                  <h3 className="text-xs lg:text-sm text-gray-5">Employee</h3>
-                  <div className="w-full flex items-center gap-1">
-                    <span>
-                      <MdPeople className="w-6 h-6 text-primary" />
-                    </span>
-                    <div className="flex gap-1 items-center">
-                      <span className="font-bold text-lg">32</span>
-                      <span>People</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full p-2">
-                  <h3 className="text-xs lg:text-sm text-gray-5">
-                    Avarage Stay
-                  </h3>
-                  <div className="w-full flex items-center gap-1">
-                    <span>
-                      <MdCardMembership className="w-6 h-6 text-primary" />
-                    </span>
-                    <div className="flex gap-1 items-center">
-                      <span className="font-bold text-lg">8</span>
-                      <span>Hours</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full p-2">
-                  <h3 className="text-xs lg:text-sm text-gray-5">Guest</h3>
-                  <div className="w-full flex items-center gap-1">
-                    <span>
-                      <MdCardMembership className="w-6 h-6 text-primary" />
-                    </span>
-                    <div className="flex gap-1 items-center">
-                      <span className="font-bold text-lg">32</span>
-                      <span>Areas</span>
-                    </div>
-                  </div>
+                  <AreaChart
+                    data={isShowChartArrival || areaData}
+                    height="400"
+                    options={areaOptions}
+                    className=""
+                  />
                 </div>
               </div>
 
-              <div className="w-full p-4 bg-white rounded-lg shadow-card">
-                <h3 className="font-thin text-lg text-gray-5">
-                  Arrival Weekly
-                </h3>
-                <AreaChart
-                  data={areaData}
-                  height="400"
-                  options={areaOptions}
-                  className=""
-                />
+              <div className="w-full mb-3">
+                <div className="w-full p-4 bg-white rounded-lg shadow-card">
+                  <h3 className="font-thin text-lg text-gray-5">
+                    Peek Time{" "}
+                    <span className="capitalize">{isSelected?.value}</span>
+                  </h3>
+                  <Barcharts
+                    data={barData}
+                    height="400"
+                    options={barOptions}
+                    className=""
+                  />
+                </div>
               </div>
             </div>
           </div>
