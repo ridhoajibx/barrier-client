@@ -9,6 +9,7 @@ import { SearchInput } from "@/components/forms/SearchInput";
 import DropdownSelect from "@/components/dropdown/DropdownSelect";
 import ReactDatePicker from "react-datepicker";
 import {
+  MdAccessTime,
   MdAdd,
   MdArrowBack,
   MdDelete,
@@ -37,6 +38,8 @@ import { FaCircleNotch } from "react-icons/fa";
 import { toast } from "react-toastify";
 import Navbar from "@/components/layouts/header/Navbar";
 import ActiveLink from "@/components/layouts/link/ActiveLink";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import axios from "axios";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -50,113 +53,10 @@ type Props = {
   pageProps: PageProps;
 };
 
-interface VehicleProps {
-  rfid?: number | string | any;
-  fullName?: string | any;
-  vehiclesType?: string | any;
-  vehiclesNumber?: string | any;
-  arrival?: string | any;
-  departure?: string | any;
+interface FormValues {
+  employee?: string | any;
+  guest?: string | any;
 }
-
-interface Options {
-  value: string | any;
-  label: string | any;
-}
-
-const sortOpt: Options[] = [
-  { value: "ASC", label: "A-Z" },
-  { value: "DESC", label: "Z-A" },
-];
-
-const stylesSelectSort = {
-  indicatorsContainer: (provided: any) => ({
-    ...provided,
-    flexDirection: "row-reverse",
-  }),
-  indicatorSeparator: (provided: any) => ({
-    ...provided,
-    display: "none",
-  }),
-  dropdownIndicator: (provided: any) => {
-    return {
-      ...provided,
-      color: "#7B8C9E",
-    };
-  },
-  clearIndicator: (provided: any) => {
-    return {
-      ...provided,
-      color: "#7B8C9E",
-    };
-  },
-  singleValue: (provided: any) => {
-    return {
-      ...provided,
-      color: "#5F59F7",
-    };
-  },
-  control: (provided: any, state: any) => {
-    return {
-      ...provided,
-      background: "",
-      padding: ".6rem",
-      borderRadius: ".75rem",
-      borderColor: state.isFocused ? "#5F59F7" : "#E2E8F0",
-      color: "#5F59F7",
-      "&:hover": {
-        color: state.isFocused ? "#E2E8F0" : "#5F59F7",
-        borderColor: state.isFocused ? "#E2E8F0" : "#5F59F7",
-      },
-      minHeight: 40,
-      flexDirection: "row-reverse",
-    };
-  },
-  menuList: (provided: any) => provided,
-};
-
-const stylesSelect = {
-  indicatorSeparator: (provided: any) => ({
-    ...provided,
-    display: "none",
-  }),
-  dropdownIndicator: (provided: any) => {
-    return {
-      ...provided,
-      color: "#7B8C9E",
-    };
-  },
-  clearIndicator: (provided: any) => {
-    return {
-      ...provided,
-      color: "#7B8C9E",
-    };
-  },
-  singleValue: (provided: any) => {
-    return {
-      ...provided,
-      color: "#5F59F7",
-    };
-  },
-  control: (provided: any, state: any) => {
-    // console.log(provided, "control")
-    return {
-      ...provided,
-      background: "",
-      padding: ".6rem",
-      borderRadius: ".75rem",
-      borderColor: state.isFocused ? "#5F59F7" : "#E2E8F0",
-      color: "#5F59F7",
-      "&:hover": {
-        color: state.isFocused ? "#E2E8F0" : "#5F59F7",
-        borderColor: state.isFocused ? "#E2E8F0" : "#5F59F7",
-      },
-      minHeight: 40,
-      // flexDirection: "row-reverse"
-    };
-  },
-  menuList: (provided: any) => provided,
-};
 
 export default function DurationSetting({ pageProps }: Props) {
   const router = useRouter();
@@ -166,8 +66,29 @@ export default function DurationSetting({ pageProps }: Props) {
   const dispatch = useAppDispatch();
   const { data, error } = useAppSelector(selectAuth);
 
-  // data vehicle-type
-  const { vehicleTypes, pending } = useAppSelector(selectVehicleTypeManagement);
+  // duration
+  const [employeeDuration, setEmployeeDuration] = useState<any>(null);
+  const [guestDuration, setGuestDuration] = useState<any>(null);
+
+  // loading
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const {
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors, isValid },
+    control,
+  } = useForm({
+    mode: "all",
+    defaultValues: useMemo<FormValues>(
+      () => ({
+        employee: null,
+        guest: null,
+      }),
+      []
+    ),
+  });
 
   useEffect(() => {
     if (!token) {
@@ -193,222 +114,94 @@ export default function DurationSetting({ pageProps }: Props) {
     return format;
   };
 
-  const [pages, setPages] = useState<number>(1);
-  const [limit, setLimit] = useState<number>(10);
-  const [total, setTotal] = useState<number>(0);
-  const [pageCount, setPageCount] = useState<number>(0);
-
-  const [search, setSearch] = useState<string | any>(null);
-  const [sort, setSort] = useState<Options | any>(null);
-  const [types, setTypes] = useState<Options | any>(null);
-  const [typesOpt, setTypesOpt] = useState<Options[] | any[]>([]);
-
-  const [dataTable, setDataTable] = useState<any[] | any>([]);
-  const [isSelected, setIsSelected] = useState<any[] | any>([]);
-  const [loading, setLoading] = useState<false>(false);
-
-  const now = new Date();
-  const [start, setStart] = useState(
-    new Date(now.getFullYear(), now.getMonth(), 1)
-  );
-  const [end, setEnd] = useState(
-    new Date(now.getFullYear(), now.getMonth() + 1, 0)
-  );
-  const [dateRange, setDateRange] = useState<Date[]>([start, end]);
-  const [startDate, endDate] = dateRange;
-
-  // modal
-  const [isForm, setIsForm] = useState<any>(null);
-  const [isCreate, setIsCreate] = useState<boolean>(false);
-  const [isUpdate, setIsUpdate] = useState<boolean>(false);
-  const [isDelete, setIsDelete] = useState<boolean>(false);
-
-  const isOpenCreate = () => {
-    setIsCreate(true);
-  };
-
-  const isCloseCreate = () => {
-    setIsForm(null);
-    setIsCreate(false);
-  };
-
-  const isOpenUpdate = (value: any) => {
-    setIsForm(value);
-    setIsUpdate(true);
-  };
-
-  const isCloseUpdate = () => {
-    setIsForm(null);
-    setIsUpdate(false);
-  };
-
-  const isOpenDelete = (value: any) => {
-    setIsForm(value);
-    setIsDelete(true);
-  };
-
-  const isCloseDelete = () => {
-    setIsForm(null);
-    setIsDelete(false);
-  };
-
-  // data-table
-  useEffect(() => {
-    if (query?.page) setPages(Number(query?.page) || 1);
-    if (query?.limit) setLimit(Number(query?.limit) || 10);
-    if (query?.search) setSearch((query?.search as any) || "");
-    if (query?.sort) {
-      if (query?.sort == "ASC") {
-        setSort({ value: query?.sort, label: "A-Z" });
+  // get-duration
+  const getIdleDuration = async (params: any) => {
+    let employee: any = null;
+    let guest: any = null;
+    let config = {
+      params: params.params,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${params.token}`,
+      },
+    };
+    try {
+      const response = await axios.get("rfid/log/idle", config);
+      const { data, status } = response;
+      if (status == 200) {
+        console.log(data, "result-idle");
+        employee = data?.employee;
+        guest = data?.guest;
       } else {
-        setSort({ value: query?.sort, label: "Z-A" });
+        throw response;
+      }
+    } catch (error: any) {
+      const { data, status } = error.response;
+      let newError: any = { message: data.message[0] };
+      employee = null;
+      guest = null;
+      toast.dark(newError.message);
+      if (error.response && error.response.status === 404) {
+        throw new Error("Idle status not found");
+      } else {
+        throw new Error(newError.message);
       }
     }
-  }, [query?.page, query?.limit, query?.search, query?.sort]);
-
-  useEffect(() => {
-    let qr: any = {
-      page: pages,
-      limit: limit,
-    };
-
-    if (search) qr = { ...qr, search: search };
-    if (sort) qr = { ...qr, sort: sort?.value };
-
-    router.replace({ pathname, query: qr });
-  }, [pages, limit, search, sort]);
-
-  const filters = useMemo(() => {
-    const qb = RequestQueryBuilder.create();
-
-    const search = {
-      $and: [
-        {
-          $or: [
-            { vehicleTypeCode: { $contL: query?.search } },
-            { vehicleTypeName: { $contL: query?.search } },
-          ],
-        },
-      ],
-    };
-
-    if (query?.page) qb.setPage(Number(query?.page) || 1);
-    if (query?.limit) qb.setLimit(Number(query?.limit) || 10);
-
-    qb.search(search);
-    if (!query?.sort) {
-      qb.sortBy({
-        field: `updatedAt`,
-        order: "DESC",
-      });
-    } else {
-      qb.sortBy({
-        field: `vehicleTypeName`,
-        order: !sort?.value ? "ASC" : sort.value,
-      });
-    }
-    qb.query();
-    return qb;
-  }, [query?.page, query?.limit, query?.search, query?.sort]);
+    setEmployeeDuration(employee);
+    setGuestDuration(guest);
+  };
 
   useEffect(() => {
     if (token) {
-      dispatch(getVehicleTypes({ token, params: filters?.queryObject }));
+      getIdleDuration({ token, params: "" });
     }
-  }, [token, filters]);
+  }, [token]);
 
-  console.log("data-table :", vehicleTypes?.data);
+  // end-duration
 
-  useEffect(() => {
-    const newArr: VehicleTypeProps[] | any[] = [];
-    let newPageCount: number | any = 0;
-    let newTotal: number | any = 0;
-    const { data, pageCount, total } = vehicleTypes;
-    if (data && data?.length > 0) {
-      data?.map((item: any) => {
-        newArr.push(item);
-      });
-      newPageCount = pageCount;
-      newTotal = total;
+  const onSubmit: SubmitHandler<FormValues> = async (value) => {
+    let newObj = {
+      employee: value?.employee
+        ? parseInt(moment(new Date(value?.employee)).format("HH:mm"))
+        : "",
+      guest: value?.guest
+        ? parseFloat(moment(new Date(value?.guest)).format("HH:mm"))
+        : "",
+    };
+
+    let config = {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    setLoading(true);
+    try {
+      const response = await axios.patch(`rfid/log/idle`, newObj, config);
+      const { data, status } = response;
+      if (status == 200) {
+        setLoading(false);
+        toast.dark("Duration has been updated");
+      } else {
+        throw response;
+      }
+    } catch (error: any) {
+      setLoading(false);
+      const { data, status } = error.response;
+      let newError: any = { message: data.message[0] };
+      toast.dark(newError.message);
+      if (error.response && error.response.status === 404) {
+        throw new Error("Idle status not found");
+      } else {
+        throw new Error(newError.message);
+      }
+    } finally {
+      getIdleDuration({ token, params: "" });
     }
-    setDataTable(newArr);
-    setPageCount(newPageCount);
-    setTotal(newTotal);
-  }, [vehicleTypes]);
-
-  // column-table
-  const columns = useMemo<ColumnDef<VehicleTypeProps, any>[]>(
-    () => [
-      {
-        accessorKey: "vehicleTypeCode",
-        header: (info) => <div className="uppercase">Vehicle Code</div>,
-        cell: ({ getValue, row }) => {
-          return <div>{getValue()}</div>;
-        },
-        footer: (props) => props.column.id,
-        enableColumnFilter: false,
-      },
-      {
-        accessorKey: "vehicleTypeName",
-        cell: ({ row, getValue }) => {
-          return <div>{getValue()}</div>;
-        },
-        header: (props) => (
-          <div className="w-full text-left uppercase">Vehicle Type</div>
-        ),
-        footer: (props) => props.column.id,
-        enableColumnFilter: false,
-      },
-      {
-        accessorKey: "id",
-        cell: ({ row, getValue }) => {
-          return (
-            <div className="w-full flex items-center justify-center gap-2">
-              <button
-                type="button"
-                className="flex items-center gap-1 p-2 rounded-md border border-gray-5 hover:bg-gray active:scale-90"
-                onClick={() => isOpenUpdate(row?.original)}>
-                <span>
-                  <MdEdit className="w-4 h-4" />
-                </span>
-              </button>
-
-              <button
-                type="button"
-                className="flex items-center gap-1 p-2 rounded-md border text-white border-danger bg-danger hover:opacity-70 active:scale-90"
-                onClick={() => isOpenDelete(row?.original)}>
-                <span>
-                  <MdDelete className="w-4 h-4" />
-                </span>
-              </button>
-            </div>
-          );
-        },
-        header: (props) => (
-          <div className="w-full text-center uppercase">Actions</div>
-        ),
-        footer: (props) => props.column.id,
-        enableColumnFilter: false,
-      },
-    ],
-    []
-  );
-
-  const onDeleteVehicle = (value: any) => {
-    console.log(value, "delete");
-    if (value?.id) {
-      dispatch(
-        deleteVehicleType({
-          token,
-          id: value?.id,
-          isSuccess: () => {
-            dispatch(getVehicleTypes({ token, params: filters.queryObject }));
-            toast.dark("Delete vehicle type is successfull");
-            isCloseDelete();
-          },
-        })
-      );
-    }
+    // console.log(newObj, "form-result");
   };
 
   return (
@@ -454,79 +247,114 @@ export default function DurationSetting({ pageProps }: Props) {
             </ActiveLink>
           </div>
 
-          <div className="w-full">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae,
-            optio.
+          <div className="w-full lg:w-1/2 flex flex-col lg:flex-row gap-2">
+            <form className="w-full">
+              <div className="w-full flex gap-2">
+                <div className="w-full lg:w-1/2 p-4">
+                  <label htmlFor="employee">Employee Duration</label>
+                  <div className="w-full relative mb-3">
+                    <Controller
+                      render={({
+                        field: { onChange, onBlur, value, name, ref },
+                        fieldState: { invalid, isTouched, isDirty, error },
+                      }) => (
+                        <ReactDatePicker
+                          selected={value}
+                          onChange={onChange}
+                          showTimeSelect
+                          showTimeSelectOnly
+                          timeIntervals={60}
+                          timeCaption="Duration"
+                          dateFormat="HH:mm"
+                          isClearable
+                          clearButtonClassName="after:w-10 after:h-10 h-10 w-10"
+                          className="text-sm lg:text-md w-full text-gray-5 rounded-lg border border-stroke bg-transparent py-4 pl-12 pr-6 outline-none focus:border-primary focus-visible:shadow-none "
+                          popperClassName="w-full"
+                        />
+                      )}
+                      name={`employee`}
+                      control={control}
+                      rules={{
+                        required: {
+                          value: true,
+                          message: "This fill is required.",
+                        },
+                      }}
+                    />
+                    <MdAccessTime className="absolute left-4 top-4 h-6 w-6 text-gray-5" />
+                  </div>
+
+                  <div className="w-full flex items-center gap-2 text-xs text-gray-5">
+                    <span>Employee duration before :</span>
+                    <span className="font-semibold">
+                      {employeeDuration || 0}
+                    </span>
+                    <span>{guestDuration > 1 ? "Hours" : "Hour"}</span>
+                  </div>
+                </div>
+
+                <div className="w-full lg:w-1/2 p-4">
+                  <label htmlFor="guest">Guest Duration</label>
+                  <div className="w-full relative mb-3">
+                    <Controller
+                      render={({
+                        field: { onChange, onBlur, value, name, ref },
+                        fieldState: { invalid, isTouched, isDirty, error },
+                      }) => (
+                        <ReactDatePicker
+                          selected={value}
+                          onChange={onChange}
+                          showTimeSelect
+                          showTimeSelectOnly
+                          timeIntervals={60}
+                          timeCaption="Duration"
+                          dateFormat="HH:mm"
+                          isClearable
+                          clearButtonClassName="after:w-10 after:h-10 h-10 w-10"
+                          className="text-sm lg:text-md w-full text-gray-5 rounded-lg border border-stroke bg-transparent py-4 pl-12 pr-6 outline-none focus:border-primary focus-visible:shadow-none "
+                          popperClassName="w-full max-w-xs"
+                        />
+                      )}
+                      name={`guest`}
+                      control={control}
+                      rules={{
+                        required: {
+                          value: true,
+                          message: "This fill is required.",
+                        },
+                      }}
+                    />
+                    <MdAccessTime className="absolute left-4 top-4 h-6 w-6 text-gray-5" />
+                  </div>
+                  <div className="w-full flex items-center gap-2 text-xs text-gray-5">
+                    <span>Guest duration before :</span>
+                    <span className="font-semibold">{guestDuration || 0}</span>
+                    <span>{guestDuration > 1 ? "Hours" : "Hour"}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="w-full p-4">
+                <Button
+                  type="submit"
+                  onClick={handleSubmit(onSubmit)}
+                  variant="primary"
+                  className="w-full lg:w-1/2 flex items-center gap-2 rounded shadow-1 active:scale-90 disabled:opacity-50"
+                  disabled={loading || !isValid}>
+                  {loading ? (
+                    <Fragment>
+                      <span>Loading...</span>
+                      <FaCircleNotch className="w-4 h-4 animate-spin-1.5" />
+                    </Fragment>
+                  ) : (
+                    <span>Update</span>
+                  )}
+                </Button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
-
-      {/* create vehicle type */}
-      <Modal isOpen={isCreate} onClose={isCloseCreate} size="small">
-        <FormVehicle
-          token={token}
-          items={isForm}
-          isClose={isCloseCreate}
-          refreshData={() =>
-            dispatch(getVehicleTypes({ token, params: filters.queryObject }))
-          }
-        />
-      </Modal>
-
-      {/* create vehicle type */}
-      <Modal isOpen={isUpdate} onClose={isCloseUpdate} size="small">
-        <FormVehicle
-          token={token}
-          items={isForm}
-          isClose={isCloseUpdate}
-          refreshData={() =>
-            dispatch(getVehicleTypes({ token, params: filters.queryObject }))
-          }
-          isUpdate
-        />
-      </Modal>
-
-      {/* delete vehicle */}
-      <Modal size="small" onClose={isCloseDelete} isOpen={isDelete}>
-        <Fragment>
-          <ModalHeader
-            className="p-4 border-b-2 border-gray mb-3"
-            isClose={true}
-            onClick={isCloseDelete}>
-            <div className="flex flex-col gap-1">
-              <h3 className="text-lg font-semibold">Delete Vehicle Type</h3>
-              <p className="text-gray-5">{`Are you sure to delete ${
-                isForm?.vehicleTypeName || ""
-              } ?`}</p>
-            </div>
-          </ModalHeader>
-          <div className="w-full flex items-center px-4 justify-end gap-2 mb-3">
-            <Button
-              type="button"
-              variant="secondary-outline"
-              className="rounded-lg border-2 border-gray-2 shadow-2 active:scale-90"
-              onClick={isCloseDelete}>
-              <span className="text-xs font-semibold">Discard</span>
-            </Button>
-
-            <Button
-              type="button"
-              variant="primary"
-              className="rounded-lg border-2 border-primary active:scale-90"
-              onClick={() => onDeleteVehicle(isForm)}
-              disabled={pending}>
-              {pending ? (
-                <Fragment>
-                  <span className="text-xs">Deleting...</span>
-                  <FaCircleNotch className="w-4 h-4 animate-spin-1.5" />
-                </Fragment>
-              ) : (
-                <span className="text-xs">Yes, Delete it!</span>
-              )}
-            </Button>
-          </div>
-        </Fragment>
-      </Modal>
     </DashboardLayouts>
   );
 }
