@@ -611,9 +611,10 @@ const Home = ({ pageProps }: Props) => {
   const valueDoughnut = ({ data, index }: any) => {
     const total = data.reduce((a: number, b: number) => a + b, 0);
     let currentValue = data[index];
-    let percentage = Math.floor((currentValue / total) * 100 + 0.5);
+    let percentage =
+      currentValue > 0 ? Math.floor((currentValue / total) * 100 + 0.5) : 0;
     return {
-      value: currentValue,
+      value: currentValue || 0,
       percent: percentage,
     };
   };
@@ -642,10 +643,12 @@ const Home = ({ pageProps }: Props) => {
                 const total = data.reduce((a: number, b: number) => a + b, 0);
 
                 const formattedLabel = data.map((val: number, i: any) => {
-                  let currentValue = val;
-                  let percentage = Math.floor(
-                    (currentValue / total) * 100 + 0.5
-                  );
+                  let currentValue = val || 0;
+                  let percentage =
+                    currentValue > 0
+                      ? Math.floor((currentValue / total) * 100 + 0.5)
+                      : 0;
+
                   return {
                     value: currentValue,
                     label,
@@ -655,7 +658,7 @@ const Home = ({ pageProps }: Props) => {
                     borderRadius: 5,
                   };
                 });
-
+                // console.log(formattedLabel, "data-value");
                 return {
                   text: `${formattedLabel[i].label} \n ${formattedLabel[i].percentage}% \n ${formattedLabel[i].value}`,
                   fillStyle: formattedLabel[i].backgroundColor,
@@ -703,7 +706,10 @@ const Home = ({ pageProps }: Props) => {
             },
             0);
             let currentValue = item.parsed;
-            let percentage = Math.floor((currentValue / total) * 100 + 0.5);
+            let percentage =
+              currentValue > 0
+                ? Math.floor((currentValue / total) * 100 + 0.5)
+                : 0;
             return `${item.label} : ${currentValue} ${
               currentValue > 1 ? "people" : "person"
             } - ${percentage}%`;
@@ -736,6 +742,8 @@ const Home = ({ pageProps }: Props) => {
       0;
     return result;
   }, [reports]);
+
+  console.log(isShowTodayReport, "data");
 
   return (
     <DashboardLayouts
