@@ -74,6 +74,7 @@ type Props = {
 type FormValues = {
   id?: any;
   rfidNumber?: string | any;
+  cardNumber?: string | any;
   rfidType?: string | any;
   vehicleType?: any;
   employeeName?: string | any;
@@ -134,6 +135,7 @@ export default function FormRFID(props: Props) {
       reset({
         id: items?.id,
         rfidNumber: items?.rfidNumber,
+        cardNumber: items?.cardNumber,
         rfidType: items?.rfidType,
         vehicleType: items?.vehicleType,
         employeeName: items?.employeeName,
@@ -200,11 +202,13 @@ export default function FormRFID(props: Props) {
     let newData: FormValues = {};
     if (!isEmployee) {
       newData = {
+        cardNumber: value?.cardNumber,
         rfidNumber: value?.rfidNumber,
         rfidType: value?.rfidType?.value,
       };
     } else {
       newData = {
+        cardNumber: value?.cardNumber,
         rfidNumber: value?.rfidNumber,
         rfidType: value?.rfidType?.value,
         vehicleType: value?.vehicleType?.id,
@@ -303,6 +307,37 @@ export default function FormRFID(props: Props) {
                 </div>
               )}
             </div>
+          </div>
+
+          <div className="w-full mb-3">
+            <label
+              className="text-gray-500 font-semibold text-sm"
+              htmlFor="cardNumber">
+              Card No.
+            </label>
+            <div className="w-full flex">
+              <input
+                id="cardNumber"
+                type="text"
+                placeholder="Card No."
+                autoFocus
+                className={`bg-white w-full text-sm rounded-lg border border-stroke bg-transparent py-3 px-4 outline-none focus:border-primary focus-visible:shadow-none disabled:border-0 disabled:bg-transparent`}
+                {...register("cardNumber", {
+                  required: {
+                    value: true,
+                    message: "Card No. is required.",
+                  },
+                })}
+              />
+            </div>
+            {errors?.cardNumber && (
+              <div className="mt-1 text-xs flex items-center text-red-300">
+                <MdWarning className="w-4 h-4 mr-1" />
+                <span className="text-red-300">
+                  {errors.cardNumber.message as any}
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="w-full mb-3">
