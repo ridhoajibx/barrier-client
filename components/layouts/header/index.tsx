@@ -243,7 +243,7 @@ const Header = ({
               {/* <!-- Notification Menu Area --> */}
               {/* <DropdownUser userDefault={userDefault} token={token} /> */}
               <div className="flex items-center gap-2">
-                <span className="h-12 w-12 rounded-full flex items-center border">
+                <span className="h-12 w-12 rounded-full flex items-center">
                   <Image
                     src={
                       users?.profileImage
@@ -280,14 +280,14 @@ const Header = ({
                 position="left"
               />
               {/* <!-- Chat Notification Area --> */}
-              <DropodownNotifications
+              {/* <DropodownNotifications
                 menus={dataNotifications}
                 label=""
                 icon={MdNotifications}
                 classIcon="w-6 h-6"
                 classMenu="text-bodydark2 hover:bg-primary hover:text-white"
                 position="left"
-              />
+              /> */}
               {/* <DropdownNotification /> */}
             </ul>
 
