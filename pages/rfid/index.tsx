@@ -1008,7 +1008,7 @@ export default function Rfid({ pageProps }: Props) {
               type="button"
               variant="primary"
               className="rounded-lg border-2 border-primary active:scale-90"
-              onClick={() => onImportData({ token, dat: files })}
+              onClick={() => onImportData({ token, data: files })}
               disabled={loadingImport}>
               {loadingImport ? (
                 <Fragment>
