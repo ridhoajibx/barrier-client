@@ -403,7 +403,7 @@ export default function VehicleType({ pageProps }: Props) {
     }
   }, [token, filters]);
 
-  console.log("data-table :", vehicleTypes?.data);
+  // console.log("data-table :", vehicleTypes?.data);
 
   useEffect(() => {
     const newArr: VehicleTypeProps[] | any[] = [];
