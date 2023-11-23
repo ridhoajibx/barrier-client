@@ -449,7 +449,8 @@ export default function Rfid({ pageProps }: Props) {
         accessorKey: "rfidNumber",
         header: (info) => <div className="uppercase">RFID</div>,
         cell: ({ getValue, row }) => {
-          return <div>{getValue() || "-"}</div>;
+          let cardNo = row?.original?.cardNumber;
+          return <div>{getValue() ? `${cardNo} - ${getValue()}` : "-"}</div>;
         },
         footer: (props) => props.column.id,
         enableColumnFilter: false,

@@ -426,15 +426,6 @@ export default function VehicleType({ pageProps }: Props) {
   const columns = useMemo<ColumnDef<VehicleTypeProps, any>[]>(
     () => [
       {
-        accessorKey: "vehicleTypeCode",
-        header: (info) => <div className="uppercase">Vehicle Code</div>,
-        cell: ({ getValue, row }) => {
-          return <div>{getValue()}</div>;
-        },
-        footer: (props) => props.column.id,
-        enableColumnFilter: false,
-      },
-      {
         accessorKey: "vehicleTypeName",
         cell: ({ row, getValue }) => {
           return <div>{getValue()}</div>;
@@ -442,6 +433,15 @@ export default function VehicleType({ pageProps }: Props) {
         header: (props) => (
           <div className="w-full text-left uppercase">Vehicle Type</div>
         ),
+        footer: (props) => props.column.id,
+        enableColumnFilter: false,
+      },
+      {
+        accessorKey: "vehicleTypeCode",
+        header: (info) => <div className="uppercase">Vehicle Code</div>,
+        cell: ({ getValue, row }) => {
+          return <div>{getValue()}</div>;
+        },
         footer: (props) => props.column.id,
         enableColumnFilter: false,
       },

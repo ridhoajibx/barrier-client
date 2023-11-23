@@ -27,6 +27,7 @@ export interface RfidProps {
   employeeName?: string | any;
   licencePlate?: string | any;
   vehicleType?: VehicleTypeProps | any;
+  cardNumber?: string | any;
 }
 
 export interface RfidLogProps {
@@ -44,6 +45,7 @@ export interface RfidLogProps {
   arrival?: string | any;
   departure?: string | any;
   rfid?: string | any;
+  cardNumber?: string | any;
 }
 
 export interface ParkingProps {
