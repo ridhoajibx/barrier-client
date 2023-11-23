@@ -68,7 +68,7 @@ export default function DurationSetting({ pageProps }: Props) {
   const { token, refreshToken } = pageProps;
 
   const dispatch = useAppDispatch();
-  const { data, error } = useAppSelector(selectAuth);
+  const { data, error, message } = useAppSelector(selectAuth);
 
   // duration
   const [employeeDuration, setEmployeeDuration] = useState<any>(null);
@@ -217,6 +217,15 @@ export default function DurationSetting({ pageProps }: Props) {
     }
     // console.log(newObj, "form-result");
   };
+
+  useEffect(() => {
+    let unauthorized = message == "Unauthorized";
+    if (unauthorized) {
+      deleteCookie("accessToken");
+      deleteCookie("refreshToken");
+      deleteCookie("roles");
+    }
+  }, [refreshToken, error, message]);
 
   return (
     <DashboardLayouts
@@ -386,6 +395,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   // Access cookies using the cookie name
   const token = cookies["accessToken"] || null;
   const refreshToken = cookies["refreshToken"] || null;
+  const roles = cookies["roles"] || null;
 
   if (!token) {
     return {
@@ -396,7 +406,16 @@ export const getServerSideProps: GetServerSideProps = async ({
     };
   }
 
+  if (!roles || roles !== "superadmin") {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: true,
+      },
+    };
+  }
+
   return {
-    props: { token, refreshToken },
+    props: { token, refreshToken, roles },
   };
 };
