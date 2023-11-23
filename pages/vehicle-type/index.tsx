@@ -568,13 +568,14 @@ export default function VehicleType({ pageProps }: Props) {
   };
 
   const onImportData = async (value: any) => {
-    if (!value) {
+    if (!value?.data) {
       return;
     }
     let newObj: any = {
-      excelFile: value?.document?.length > 0 ? value?.document[0] : "",
+      excelFile: value?.data?.length > 0 ? value?.data?.[0].documentSource : "",
     };
-    console.log(newObj, "import");
+    // console.log(value.data[0].documentSource, "data-import");
+    // console.log(newObj, "import");
     dispatch(
       importVehicleType({
         token,
@@ -863,7 +864,7 @@ export default function VehicleType({ pageProps }: Props) {
               type="button"
               variant="primary"
               className="rounded-lg border-2 border-primary active:scale-90"
-              onClick={() => onImportData({ token, data })}
+              onClick={() => onImportData({ token, data: files })}
               disabled={loadingImport}>
               {loadingImport ? (
                 <Fragment>
