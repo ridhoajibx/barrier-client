@@ -82,7 +82,9 @@ export const getReports = createAsyncThunk<
   } catch (error: any) {
     const { data, status } = error.response;
     let newError: any = { message: data.message[0] };
-    toast.dark(newError.message);
+    if (error.response.status !== 401) {
+      toast.dark(newError.message);
+    }
     if (error.response && error.response.status === 404) {
       throw new Error("report not found");
     } else {
@@ -115,7 +117,9 @@ export const getReportById = createAsyncThunk<
   } catch (error: any) {
     const { data, status } = error.response;
     let newError: any = { message: data.message[0] };
-    toast.dark(newError.message);
+    if (error.response.status !== 401) {
+      toast.dark(newError.message);
+    }
     if (error.response && error.response.status === 404) {
       throw new Error("report not found");
     } else {

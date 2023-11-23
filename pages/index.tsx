@@ -732,21 +732,23 @@ const Home = ({ pageProps }: Props) => {
       getAuthMe({
         token,
         callback: () => {
-          webRefresh({
-            token: refreshToken,
-            isSuccess: () => {
-              router.replace({ pathname, query });
-            },
-            isError: () => {
-              deleteCookie("role");
-              deleteCookie("accessToken");
-              deleteCookie("refreshToken");
-            },
-          });
+          dispatch(
+            webRefresh({
+              token: refreshToken,
+              isSuccess: () => {
+                router.replace({ pathname, query });
+              },
+              isError: () => {
+                deleteCookie("role");
+                deleteCookie("accessToken");
+                deleteCookie("refreshToken");
+              },
+            })
+          );
         },
       })
     );
-  }, [token]);
+  }, [token, refreshToken]);
 
   const averageReports = useMemo(() => {
     let result =

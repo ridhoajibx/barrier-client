@@ -81,7 +81,9 @@ export const getUsers = createAsyncThunk<
   } catch (error: any) {
     const { data, status } = error.response;
     let newError: any = { message: data.message[0] };
-    toast.dark(newError.message);
+    if (error.response.status !== 401) {
+      toast.dark(newError.message);
+    }
     if (error.response && error.response.status === 404) {
       throw new Error("User not found");
     } else {
@@ -114,7 +116,9 @@ export const getUserById = createAsyncThunk<
   } catch (error: any) {
     const { data, status } = error.response;
     let newError: any = { message: data.message[0] };
-    toast.dark(newError.message);
+    if (error.response.status !== 401) {
+      toast.dark(newError.message);
+    }
     if (error.response && error.response.status === 404) {
       throw new Error("User not found");
     } else {
@@ -145,7 +149,9 @@ export const createUser = createAsyncThunk<any, UserData, { state: RootState }>(
     } catch (error: any) {
       const { data, status } = error.response;
       let newError: any = { message: data.message[0] };
-      toast.dark(newError.message);
+      if (error.response.status !== 401) {
+        toast.dark(newError.message);
+      }
       if (error.response && error.response.status === 404) {
         throw new Error("User not found");
       } else {
@@ -181,7 +187,9 @@ export const updateUser = createAsyncThunk<any, UserData, { state: RootState }>(
     } catch (error: any) {
       const { data, status } = error.response;
       let newError: any = { message: data.message[0] };
-      toast.dark(newError.message);
+      if (error.response.status !== 401) {
+        toast.dark(newError.message);
+      }
       if (error.response && error.response.status === 404) {
         throw new Error("User not found");
       } else {
@@ -213,7 +221,9 @@ export const deleteUser = createAsyncThunk<any, UserData, { state: RootState }>(
     } catch (error: any) {
       const { data, status } = error.response;
       let newError: any = { message: data.message[0] };
-      toast.dark(newError.message);
+      if (error.response.status !== 401) {
+        toast.dark(newError.message);
+      }
       if (error.response && error.response.status === 404) {
         throw new Error("User not found");
       } else {

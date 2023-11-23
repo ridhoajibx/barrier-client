@@ -192,11 +192,11 @@ export const getAuthMe = createAsyncThunk<any, MyData, { state: RootState }>(
       if (error.response && error.response.status === 404) {
         throw new Error("User not found");
       } else {
-        // if (status == 401) {
-        //   deleteCookie("role");
-        //   deleteCookie("accessToken");
-        // }
-        params.callback();
+        if (status == 401) {
+          // deleteCookie("role");
+          // deleteCookie("accessToken");
+          params.callback();
+        }
         throw new Error(newError.message);
       }
     }

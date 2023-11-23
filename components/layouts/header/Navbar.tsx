@@ -186,19 +186,19 @@ const Navbar = ({ header, userDefault, title, token }: HeaderProps) => {
                 </ActiveLink>
 
                 <ActiveLink
-                  pages={"RFID"}
-                  href={{ pathname: "/rfid" }}
-                  activeClassName=""
-                  className="w-full lg:justify-center text-am lg:text-base text-gray hover:text-white">
-                  RFID
-                </ActiveLink>
-
-                <ActiveLink
                   pages={"vehicle-type"}
                   href={{ pathname: "/vehicle-type" }}
                   activeClassName=""
                   className="w-full lg:justify-center text-sm lg:text-base text-gray hover:text-white">
                   Vehicle Type
+                </ActiveLink>
+
+                <ActiveLink
+                  pages={"RFID"}
+                  href={{ pathname: "/rfid" }}
+                  activeClassName=""
+                  className="w-full lg:justify-center text-am lg:text-base text-gray hover:text-white">
+                  RFID
                 </ActiveLink>
               </div>
             </div>
@@ -234,19 +234,19 @@ const Navbar = ({ header, userDefault, title, token }: HeaderProps) => {
             </ActiveLink>
 
             <ActiveLink
-              pages={"RFID"}
-              href={{ pathname: "/rfid" }}
-              activeClassName=""
-              className="w-full lg:justify-center text-base lg:text-lg text-gray hover:text-white">
-              RFID
-            </ActiveLink>
-
-            <ActiveLink
               pages={"vehicle-type"}
               href={{ pathname: "/vehicle-type" }}
               activeClassName=""
               className="w-full lg:justify-center text-base lg:text-lg text-gray hover:text-white">
               Vehicle Type
+            </ActiveLink>
+
+            <ActiveLink
+              pages={"RFID"}
+              href={{ pathname: "/rfid" }}
+              activeClassName=""
+              className="w-full lg:justify-center text-base lg:text-lg text-gray hover:text-white">
+              RFID
             </ActiveLink>
           </div>
         </div>

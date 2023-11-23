@@ -188,21 +188,23 @@ export default function UserSetting({ pageProps }: Props) {
       getAuthMe({
         token,
         callback: () => {
-          webRefresh({
-            token: refreshToken,
-            isSuccess: () => {
-              router.replace({ pathname, query });
-            },
-            isError: () => {
-              deleteCookie("role");
-              deleteCookie("accessToken");
-              deleteCookie("refreshToken");
-            },
-          });
+          dispatch(
+            webRefresh({
+              token: refreshToken,
+              isSuccess: () => {
+                router.replace({ pathname, query });
+              },
+              isError: () => {
+                deleteCookie("role");
+                deleteCookie("accessToken");
+                deleteCookie("refreshToken");
+              },
+            })
+          );
         },
       })
     );
-  }, [token]);
+  }, [token, refreshToken]);
 
   const dateFormat = (value: any) => {
     let format: any = null;
