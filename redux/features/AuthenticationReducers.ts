@@ -70,6 +70,12 @@ interface MyData {
   callback: () => void;
 }
 
+interface RefreshData {
+  token?: any;
+  isSuccess: () => void;
+  isError: () => void;
+}
+
 // rejection
 interface RejectedAction extends Action {
   error: Error;
@@ -114,46 +120,47 @@ export const webLogin = createAsyncThunk<any, AuthData, { state: RootState }>(
   }
 );
 
-export const webRefresh = createAsyncThunk<any, AuthData, { state: RootState }>(
-  "auth/login",
-  async (params, { getState }) => {
-    let config: HeadersConfiguration = {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${params.token}`,
-      },
-    };
-    try {
-      const response = await axios.get("auth/refresh", config);
-      const { data, status } = response;
-      if (status == 200) {
-        toast.dark("Sign in successfully!");
-        setCookie("accessToken", data?.accessToken, {
-          secure: true,
-          maxAge: 60 * 60 * 24,
-        });
-        setCookie("refreshToken", data?.refreshToken, {
-          secure: true,
-          maxAge: 60 * 60 * 24,
-        });
-        params.callback();
-        return data;
-      } else {
-        throw response;
-      }
-    } catch (error: any) {
-      const { data, status } = error.response;
-      let newError: any = { message: data.message[0] };
-      toast.dark(newError?.message);
-      if (error.response && error.response.status === 404) {
-        throw new Error("User not found");
-      } else {
-        throw new Error(newError.message);
-      }
+export const webRefresh = createAsyncThunk<
+  any,
+  RefreshData,
+  { state: RootState }
+>("auth/login", async (params, { getState }) => {
+  let config: HeadersConfiguration = {
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${params.token}`,
+    },
+  };
+  try {
+    const response = await axios.get("auth/refresh", config);
+    const { data, status } = response;
+    if (status == 200) {
+      setCookie("accessToken", data?.accessToken, {
+        secure: true,
+        maxAge: 60 * 60 * 24,
+      });
+      setCookie("refreshToken", data?.refreshToken, {
+        secure: true,
+        maxAge: 60 * 60 * 24,
+      });
+      params.isSuccess();
+      return data;
+    } else {
+      throw response;
+    }
+  } catch (error: any) {
+    const { data, status } = error.response;
+    let newError: any = { message: data.message[0] };
+    toast.dark(newError?.message);
+    params.isSuccess();
+    if (error.response && error.response.status === 404) {
+      throw new Error("User not found");
+    } else {
+      throw new Error(newError.message);
     }
   }
-);
+});
 
 // Auth me
 export const getAuthMe = createAsyncThunk<any, MyData, { state: RootState }>(
@@ -181,14 +188,13 @@ export const getAuthMe = createAsyncThunk<any, MyData, { state: RootState }>(
     } catch (error: any) {
       const { data, status } = error.response;
       let newError: any = { message: data.message[0] };
-      toast.dark(newError.message);
+      // toast.dark(newError.message);
       if (error.response && error.response.status === 404) {
         throw new Error("User not found");
       } else {
         if (status == 401) {
           deleteCookie("role");
           deleteCookie("accessToken");
-          deleteCookie("refreshToken");
           params.callback();
         }
         throw new Error(newError.message);

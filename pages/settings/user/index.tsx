@@ -20,7 +20,11 @@ import {
 import { GetServerSideProps } from "next";
 import { deleteCookie, getCookies } from "cookies-next";
 import { useAppDispatch, useAppSelector } from "@/redux/Hooks";
-import { getAuthMe, selectAuth } from "@/redux/features/AuthenticationReducers";
+import {
+  getAuthMe,
+  selectAuth,
+  webRefresh,
+} from "@/redux/features/AuthenticationReducers";
 import {
   deleteVehicleType,
   getVehicleTypes,
@@ -184,9 +188,17 @@ export default function UserSetting({ pageProps }: Props) {
       getAuthMe({
         token,
         callback: () => {
-          deleteCookie("accessToken");
-          deleteCookie("refreshToken");
-          deleteCookie("roles");
+          webRefresh({
+            token: refreshToken,
+            isSuccess: () => {
+              router.replace({ pathname, query });
+            },
+            isError: () => {
+              deleteCookie("role");
+              deleteCookie("accessToken");
+              deleteCookie("refreshToken");
+            },
+          });
         },
       })
     );

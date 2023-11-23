@@ -63,6 +63,7 @@ const Header = ({
   const dispatch = useAppDispatch();
   const { data, pending, error, message } = useAppSelector(selectAuth);
   const router = useRouter();
+  const { query, pathname } = router;
   const [isSignOut, setIsSignOut] = useState<boolean>(false);
   const dataNotifications = [
     {
@@ -192,24 +193,29 @@ const Header = ({
     },
   ];
 
-  useEffect(() => {
-    let filter = error && message == "jwt expired";
-    let unauthorized = message == "Unauthorized";
-    if (filter) {
-      dispatch(
-        webRefresh({
-          token: refreshToken,
-          callback: () => {
-            toast.dark("Login access has been refresh");
-          },
-        })
-      );
-    } else if (unauthorized) {
-      deleteCookie("accessToken");
-      deleteCookie("refreshToken");
-      deleteCookie("roles");
-    }
-  }, [refreshToken, error, message]);
+  // useEffect(() => {
+  //   let filter = error && message == "jwt expired";
+  //   let unauthorized = message == "Unauthorized";
+  //   if (filter) {
+  //     dispatch(
+  //       webRefresh({
+  //         token: refreshToken,
+  //         isSuccess: () => {
+  //           router.replace({ pathname, query });
+  //         },
+  //         isError: () => {
+  //           deleteCookie("role");
+  //           deleteCookie("accessToken");
+  //           deleteCookie("refreshToken");
+  //         },
+  //       })
+  //     );
+  //   } else if (unauthorized) {
+  //     deleteCookie("accessToken");
+  //     deleteCookie("refreshToken");
+  //     deleteCookie("roles");
+  //   }
+  // }, [refreshToken, error, message]);
 
   console.log({ error, message }, "error-auth");
 
