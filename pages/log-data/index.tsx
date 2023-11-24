@@ -1,4 +1,4 @@
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element */
 import { Inter } from "next/font/google";
 import DashboardLayouts from "@/components/layouts/DashboardLayouts";
 import { Fragment, useEffect, useMemo, useState } from "react";
@@ -9,10 +9,9 @@ import { SearchInput } from "@/components/forms/SearchInput";
 import DropdownSelect from "@/components/dropdown/DropdownSelect";
 import ReactDatePicker from "react-datepicker";
 import {
-  MdAdd,
-  MdDelete,
   MdDownload,
   MdEdit,
+  MdImage,
   MdOutlineCalendarToday,
   MdWarning,
 } from "react-icons/md";
@@ -32,14 +31,10 @@ import {
 } from "@/redux/features/rfid/rfidReducers";
 import { useRouter } from "next/router";
 import { RequestQueryBuilder } from "@nestjsx/crud-request";
-import { RfidLogProps, RfidProps } from "@/utils/propTypes";
-import {
-  getVehicleTypes,
-  selectVehicleTypeManagement,
-} from "@/redux/features/vehicleType/vehicleTypeReducers";
+import { RfidLogProps } from "@/utils/propTypes";
+import { selectVehicleTypeManagement } from "@/redux/features/vehicleType/vehicleTypeReducers";
 import Button from "@/components/button/Button";
 import Modal from "@/components/modal/Modal";
-import FormRFID from "@/components/forms/rfid/FormRFID";
 import { ModalHeader } from "@/components/modal/ModalComponent";
 import { toast } from "react-toastify";
 import { FaCircleNotch } from "react-icons/fa";
@@ -176,6 +171,10 @@ const RfidTypeOptions: Options[] = [
   },
 ];
 
+const valueNull = (value: any) => {
+  return <div className={`italic font-light text-slate-400`}> {value}</div>;
+};
+
 export default function Rfid({ pageProps }: Props) {
   const router = useRouter();
   const { pathname, query } = router;
@@ -238,6 +237,7 @@ export default function Rfid({ pageProps }: Props) {
 
   const [dataTable, setDataTable] = useState<any[] | any>([]);
   const [isSelected, setIsSelected] = useState<any[] | any>([]);
+  const [isCaptured, setIsCaptured] = useState<Object | any>({});
   const [loading, setLoading] = useState<boolean>(false);
 
   const now = new Date();
@@ -255,6 +255,7 @@ export default function Rfid({ pageProps }: Props) {
   const [isCreate, setIsCreate] = useState<boolean>(false);
   const [isUpdate, setIsUpdate] = useState<boolean>(false);
   const [isDelete, setIsDelete] = useState<boolean>(false);
+  const [isPicture, setIsPicture] = useState<boolean>(false);
   // export
   const [loadingExport, setLoadingExport] = useState<boolean>(false);
   const [isExport, setIsExport] = useState<boolean>(false);
@@ -294,6 +295,16 @@ export default function Rfid({ pageProps }: Props) {
 
   const isCloseExport = () => {
     setIsExport(false);
+  };
+
+  const isOpenPicture = (value: any) => {
+    setIsCaptured(value);
+    setIsPicture(true);
+  };
+
+  const isClosePicture = () => {
+    setIsCaptured({});
+    setIsPicture(false);
   };
 
   // data-table
@@ -450,7 +461,11 @@ export default function Rfid({ pageProps }: Props) {
         header: (info) => <div className="uppercase">RFID</div>,
         cell: ({ getValue, row }) => {
           let cardNo = row?.original?.cardNumber;
-          return <div>{getValue() ? `${cardNo} - ${getValue()}` : "-"}</div>;
+          return (
+            <div className="w-55">
+              {getValue() ? `${cardNo} - ${getValue()}` : "-"}
+            </div>
+          );
         },
         footer: (props) => props.column.id,
         enableColumnFilter: false,
@@ -460,9 +475,9 @@ export default function Rfid({ pageProps }: Props) {
         cell: ({ row, getValue }) => {
           const { guestName, rfidType } = row?.original;
           if (rfidType == "guest") {
-            return <div>{guestName || "-"}</div>;
+            return <div>{guestName || valueNull("Unnamed")}</div>;
           } else {
-            return <div>{getValue() || "-"}</div>;
+            return <div>{getValue() || valueNull("Unnamed")}</div>;
           }
         },
         header: (props) => (
@@ -489,9 +504,9 @@ export default function Rfid({ pageProps }: Props) {
         cell: ({ row, getValue }) => {
           const { guestVehicle, rfidType } = row?.original;
           if (rfidType == "guest") {
-            return <div>{guestVehicle || "-"}</div>;
+            return <div>{guestVehicle || valueNull("Unidentified")}</div>;
           } else {
-            return <div>{getValue() || "-"}</div>;
+            return <div>{getValue() || valueNull("Unidentified")}</div>;
           }
         },
         header: (props) => (
@@ -506,9 +521,9 @@ export default function Rfid({ pageProps }: Props) {
         cell: ({ row, getValue }) => {
           const { guestLicencePlate, rfidType } = row?.original;
           if (rfidType == "guest") {
-            return <div>{guestLicencePlate || "-"}</div>;
+            return <div>{guestLicencePlate || valueNull("Unidentified")}</div>;
           } else {
-            return <div>{getValue() || "-"}</div>;
+            return <div>{getValue() || valueNull("Unidentified")}</div>;
           }
         },
         header: (props) => (
@@ -573,7 +588,7 @@ export default function Rfid({ pageProps }: Props) {
       {
         accessorKey: "departure",
         cell: ({ row, getValue }) => {
-          return <div>{!getValue() ? "-" : dateFormat(getValue())}</div>;
+          return <div>{!getValue() ? "- -" : dateFormat(getValue())}</div>;
         },
         header: (props) => (
           <div className="w-full text-left uppercase">Departure Time</div>
@@ -588,6 +603,15 @@ export default function Rfid({ pageProps }: Props) {
 
           return (
             <div className="w-full flex items-center justify-center gap-2">
+              <button
+                type="button"
+                className={`flex items-center gap-1 p-2 rounded-md border border-gray-5 hover:bg-gray active:scale-90`}
+                onClick={() => isOpenPicture(row?.original)}>
+                <span>
+                  <MdImage className="w-4 h-4" />
+                </span>
+              </button>
+
               <button
                 type="button"
                 className={`flex items-center gap-1 p-2 rounded-md border border-gray-5 hover:bg-gray active:scale-90 ${
@@ -882,6 +906,50 @@ export default function Rfid({ pageProps }: Props) {
                 <span className="text-xs">Yes, Export it!</span>
               )}
             </Button>
+          </div>
+        </Fragment>
+      </Modal>
+
+      {/* picture cctv */}
+      <Modal size="medium" onClose={isClosePicture} isOpen={isPicture}>
+        <Fragment>
+          <ModalHeader
+            className="p-4 border-b-2 border-gray mb-3"
+            isClose={true}
+            onClick={isClosePicture}>
+            <h3 className="text-lg font-semibold ">
+              Arrival and Departure Captures
+            </h3>
+          </ModalHeader>
+          <div className="w-full flex flex-row justify-between px-10 py-5 gap-10 mb-3">
+            <div className="text-center">
+              <h3 className="text-lg font-semibold ">Arrival</h3>
+              <img
+                src="/images/barrier-gate.png"
+                src={
+                  isCaptured?.cctvArrival
+                    ? `https://api-dev.orijinsupremasi.id/rfid/log/files/${isCaptured.cctvArrival}`
+                    : "/images/barrier-gate.png"
+                }
+                alt={`Image`}
+                className="w-100 h-50  object-cover rounded-xl"
+                className="w-100 h-50 object-cover rounded-xl"
+              />
+            </div>
+            <div className="text-center">
+              <h3 className="text-lg font-semibold ">Departure</h3>
+
+              <img
+                src="/images/barrier-gate.png"
+                src={
+                  isCaptured?.cctvDeparture
+                    ? `https://api-dev.orijinsupremasi.id/rfid/log/files/${isCaptured.cctvDeparture}`
+                    : "/images/barrier-gate.png"
+                }
+                alt={`Image`}
+                className="w-100 h-50 object-cover rounded-xl"
+              />
+            </div>
           </div>
         </Fragment>
       </Modal>

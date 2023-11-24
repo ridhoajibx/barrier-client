@@ -1,9 +1,9 @@
+/* eslint-disable @next/next/no-img-element */
 import { Inter } from "next/font/google";
 import DashboardLayouts from "@/components/layouts/DashboardLayouts";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import moment from "moment";
-import ReactDatePicker from "react-datepicker";
-import { MdAccessTime, MdArrowBack, MdLockOpen } from "react-icons/md";
+import { MdArrowBack, MdLockOpen } from "react-icons/md";
 import { GetServerSideProps } from "next";
 import { deleteCookie, getCookies } from "cookies-next";
 import { useAppDispatch, useAppSelector } from "@/redux/Hooks";
@@ -12,13 +12,13 @@ import {
   selectAuth,
   webRefresh,
 } from "@/redux/features/AuthenticationReducers";
-import Button from "@/components/button/Button";
 import { useRouter } from "next/router";
-import { FaCircleNotch } from "react-icons/fa";
 import { toast } from "react-toastify";
 import ActiveLink from "@/components/layouts/link/ActiveLink";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import axios from "axios";
+import Button from "@/components/button/Button";
+import { FaCircleNotch } from "react-icons/fa";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -37,13 +37,13 @@ interface FormValues {
   guest?: string | any;
 }
 
-export default function DurationSetting({ pageProps }: Props) {
+export default function ManualSetting({ pageProps }: Props) {
   const router = useRouter();
   const { query, pathname } = router;
   const { token, refreshToken } = pageProps;
 
   const dispatch = useAppDispatch();
-  const { data, error, message } = useAppSelector(selectAuth);
+  const { data, error } = useAppSelector(selectAuth);
 
   // duration
   const [employeeDuration, setEmployeeDuration] = useState<any>(null);
@@ -77,23 +77,21 @@ export default function DurationSetting({ pageProps }: Props) {
       getAuthMe({
         token,
         callback: () => {
-          dispatch(
-            webRefresh({
-              token: refreshToken,
-              isSuccess: () => {
-                router.replace({ pathname, query });
-              },
-              isError: () => {
-                deleteCookie("role");
-                deleteCookie("accessToken");
-                deleteCookie("refreshToken");
-              },
-            })
-          );
+          webRefresh({
+            token: refreshToken,
+            isSuccess: () => {
+              router.replace({ pathname, query });
+            },
+            isError: () => {
+              deleteCookie("role");
+              deleteCookie("accessToken");
+              deleteCookie("refreshToken");
+            },
+          });
         },
       })
     );
-  }, [token, refreshToken]);
+  }, [token]);
 
   const dateFormat = (value: any) => {
     let format: any = null;
@@ -193,15 +191,6 @@ export default function DurationSetting({ pageProps }: Props) {
     // console.log(newObj, "form-result");
   };
 
-  useEffect(() => {
-    let unauthorized = message == "Unauthorized";
-    if (unauthorized) {
-      deleteCookie("accessToken");
-      deleteCookie("refreshToken");
-      deleteCookie("roles");
-    }
-  }, [refreshToken, error, message]);
-
   return (
     <DashboardLayouts
       userDefault="/images/logo.png"
@@ -253,111 +242,64 @@ export default function DurationSetting({ pageProps }: Props) {
             </ActiveLink>
           </div>
 
-          <div className="w-full lg:w-1/2 flex flex-col lg:flex-row gap-2">
+          <div className="w-full lg:w-1/2 flex flex-col lg:flex-row">
             <form className="w-full">
-              <div className="w-full flex gap-2">
-                <div className="w-full lg:w-1/2 p-4">
-                  <label htmlFor="employee">Employee Duration</label>
-                  <div className="w-full relative mb-3">
-                    <Controller
-                      render={({
-                        field: { onChange, onBlur, value, name, ref },
-                        fieldState: { invalid, isTouched, isDirty, error },
-                      }) => (
-                        <ReactDatePicker
-                          selected={value}
-                          onChange={onChange}
-                          showTimeSelect
-                          showTimeSelectOnly
-                          timeIntervals={60}
-                          timeCaption="Duration"
-                          dateFormat="HH:mm"
-                          timeFormat="HH:mm"
-                          isClearable
-                          clearButtonClassName="after:w-10 after:h-10 h-10 w-10"
-                          className="text-sm lg:text-md w-full text-gray-5 rounded-lg border border-stroke bg-transparent py-4 pl-12 pr-6 outline-none focus:border-primary focus-visible:shadow-none "
-                          popperClassName="w-full"
-                        />
-                      )}
-                      name={`employee`}
-                      control={control}
-                      rules={{
-                        required: {
-                          value: true,
-                          message: "This fill is required.",
-                        },
-                      }}
+              <div className="w-full flex gap-4">
+                <div className="w-full flex flex-col lg:w-1/2 p-4 font-bold gap-4 bg-[#FFC5C2] rounded-md">
+                  <label htmlFor="employee">Manual Gate - OPEN</label>
+                  <div className="flex items-center">
+                    <img
+                      src="/images/gate-open.png"
+                      alt={`Image`}
+                      className="w-[221px] h-auto object-contain m-auto "
                     />
-                    <MdAccessTime className="absolute left-4 top-4 h-6 w-6 text-gray-5" />
                   </div>
-
-                  <div className="w-full flex items-center gap-2 text-xs text-gray-5">
-                    <span>Employee duration before :</span>
-                    <span className="font-semibold">
-                      {employeeDuration || 0}
-                    </span>
-                    <span>{guestDuration > 1 ? "Hours" : "Hour"}</span>
+                  <div className="w-full">
+                    <Button
+                      type="submit"
+                      onClick={() => console.log("open")}
+                      variant="danger"
+                      className="w-full flex items-center gap-2 rounded shadow-1 active:scale-90 disabled:opacity-50"
+                      disabled={loading || !isValid}>
+                      {loading ? (
+                        <Fragment>
+                          <span>Loading...</span>
+                          <FaCircleNotch className="w-4 h-4 animate-spin-1.5" />
+                        </Fragment>
+                      ) : (
+                        <span>OPEN</span>
+                      )}
+                    </Button>
                   </div>
                 </div>
 
-                <div className="w-full lg:w-1/2 p-4">
-                  <label htmlFor="guest">Guest Duration</label>
-                  <div className="w-full relative mb-3">
-                    <Controller
-                      render={({
-                        field: { onChange, onBlur, value, name, ref },
-                        fieldState: { invalid, isTouched, isDirty, error },
-                      }) => (
-                        <ReactDatePicker
-                          selected={value}
-                          onChange={onChange}
-                          showTimeSelect
-                          showTimeSelectOnly
-                          timeIntervals={60}
-                          timeCaption="Duration"
-                          dateFormat="HH:mm"
-                          timeFormat="HH:mm"
-                          isClearable
-                          clearButtonClassName="after:w-10 after:h-10 h-10 w-10"
-                          className="text-sm lg:text-md w-full text-gray-5 rounded-lg border border-stroke bg-transparent py-4 pl-12 pr-6 outline-none focus:border-primary focus-visible:shadow-none "
-                          popperClassName="w-full"
-                        />
-                      )}
-                      name={`guest`}
-                      control={control}
-                      rules={{
-                        required: {
-                          value: true,
-                          message: "This fill is required.",
-                        },
-                      }}
+                <div className="w-full flex flex-col lg:w-1/2 p-4 font-bold gap-4 bg-[#E2EEFA] rounded-md">
+                  <label htmlFor="employee">Manual Gate - CLOSE</label>
+                  <div className=" flex items-center">
+                    <img
+                      src="/images/gate-close.png"
+                      alt={`Image`}
+                      className="w-[221px] h-auto object-contain m-auto "
                     />
-                    <MdAccessTime className="absolute left-4 top-4 h-6 w-6 text-gray-5" />
                   </div>
-                  <div className="w-full flex items-center gap-2 text-xs text-gray-5">
-                    <span>Guest duration before :</span>
-                    <span className="font-semibold">{guestDuration || 0}</span>
-                    <span>{guestDuration > 1 ? "Hours" : "Hour"}</span>
+                  <div className="w-full">
+                    <Button
+                      type="submit"
+                      onClick={() => console.log("close")}
+                      variant="primary"
+                      className="w-full flex items-center gap-2 rounded shadow-1 active:scale-90 disabled:opacity-50"
+                      disabled={loading || !isValid}>
+                      {loading ? (
+                        <Fragment>
+                          <span>Loading...</span>
+                          <FaCircleNotch className="w-4 h-4 animate-spin-1.5" />
+                        </Fragment>
+                      ) : (
+                        <span>CLOSE</span>
+                      )}
+                    </Button>
                   </div>
                 </div>
-              </div>
-
-              <div className="w-full p-4">
-                <Button
-                  type="submit"
-                  onClick={handleSubmit(onSubmit)}
-                  variant="primary"
-                  className="w-full lg:w-1/2 flex items-center gap-2 rounded shadow-1 active:scale-90 disabled:opacity-50"
-                  disabled={loading || !isValid}>
-                  {loading ? (
-                    <Fragment>
-                      <span>Loading...</span>
-                      <FaCircleNotch className="w-4 h-4 animate-spin-1.5" />
-                    </Fragment>
-                  ) : (
-                    <span>Update</span>
-                  )}
-                </Button>
               </div>
             </form>
           </div>
@@ -378,7 +320,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   // Access cookies using the cookie name
   const token = cookies["accessToken"] || null;
   const refreshToken = cookies["refreshToken"] || null;
-  const roles = cookies["roles"] || null;
 
   if (!token) {
     return {
@@ -389,16 +330,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     };
   }
 
-  if (!roles || roles !== "superadmin") {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: true,
-      },
-    };
-  }
-
   return {
-    props: { token, refreshToken, roles },
+    props: { token, refreshToken },
   };
 };

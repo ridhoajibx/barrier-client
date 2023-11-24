@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { Inter } from "next/font/google";
 import DashboardLayouts from "@/components/layouts/DashboardLayouts";
 import { Fragment, useEffect, useMemo, useState } from "react";
@@ -7,15 +6,12 @@ import { ColumnDef } from "@tanstack/react-table";
 import moment from "moment";
 import { SearchInput } from "@/components/forms/SearchInput";
 import DropdownSelect from "@/components/dropdown/DropdownSelect";
-import ReactDatePicker from "react-datepicker";
 import {
   MdAdd,
   MdArrowBack,
   MdDelete,
   MdEdit,
-  MdKeyOff,
   MdLockOpen,
-  MdOutlineCalendarToday,
 } from "react-icons/md";
 import { GetServerSideProps } from "next";
 import { deleteCookie, getCookies } from "cookies-next";
@@ -25,21 +21,15 @@ import {
   selectAuth,
   webRefresh,
 } from "@/redux/features/AuthenticationReducers";
-import {
-  deleteVehicleType,
-  getVehicleTypes,
-  selectVehicleTypeManagement,
-} from "@/redux/features/vehicleType/vehicleTypeReducers";
-import { UserProps, VehicleTypeProps } from "@/utils/propTypes";
+import { selectVehicleTypeManagement } from "@/redux/features/vehicleType/vehicleTypeReducers";
+import { UserProps } from "@/utils/propTypes";
 import Button from "@/components/button/Button";
 import { useRouter } from "next/router";
 import { RequestQueryBuilder } from "@nestjsx/crud-request";
 import Modal from "@/components/modal/Modal";
 import { ModalHeader } from "@/components/modal/ModalComponent";
-import FormVehicle from "@/components/forms/vehicle-type/FormVehicle";
 import { FaCircleNotch } from "react-icons/fa";
 import { toast } from "react-toastify";
-import Navbar from "@/components/layouts/header/Navbar";
 import ActiveLink from "@/components/layouts/link/ActiveLink";
 import {
   deleteUser,
@@ -494,6 +484,14 @@ export default function UserSetting({ pageProps }: Props) {
               activeClassName="text-primary border-b-2 border-primary"
               className="w-full lg:justify-center text-sm lg:text-base text-gray-6 hover:text-primary">
               Idle Status
+            </ActiveLink>
+
+            <ActiveLink
+              pages={"manual"}
+              href={{ pathname: "/settings/manual" }}
+              activeClassName="text-primary border-b-2 border-primary"
+              className="w-full lg:justify-center text-sm lg:text-base text-gray-6 hover:text-primary">
+              Manual
             </ActiveLink>
           </div>
 
