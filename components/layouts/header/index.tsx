@@ -24,7 +24,9 @@ import {
   MdNotifications,
   MdPeople,
   MdPerson,
+  MdRemoveCircle,
   MdSettings,
+  MdWarning,
 } from "react-icons/md";
 import {
   FaCircleNotch,
@@ -42,6 +44,7 @@ import {
 } from "@/redux/features/AuthenticationReducers";
 import { toast } from "react-toastify";
 import { deleteCookie } from "cookies-next";
+import Button from "@/components/button/Button";
 
 type HeaderProps = {
   header?: string;
@@ -221,8 +224,28 @@ const Header = ({
 
   return (
     <Fragment>
-      <header className="static z-999 flex w-full bg-white drop-shadow-none">
-        <div className="flex flex-grow items-center justify-between py-4 px-4 shadow-2 md:px-6 2xl:px-11">
+      <header className="static z-999 flex flex-col md:flex-row w-full bg-white drop-shadow-none">
+        <div className="flex md:hidden items-center justify-center py-2 md:py-0 gap-2">
+          <Button
+            className="rounded-md text-xs active:scale-90 duration-300"
+            variant={"danger"}>
+            <span>Gate Force Open</span>
+            <span>
+              <MdWarning className="w-4 h-4" />
+            </span>
+          </Button>
+
+          <Button
+            className="rounded-md text-xs bg-green-500 text-white active:scale-90 duration-300"
+            variant={"success"}>
+            <span>Gate Force Close</span>
+            <span>
+              <MdRemoveCircle className="w-4 h-4" />
+            </span>
+          </Button>
+        </div>
+
+        <div className="flex flex-grow items-center justify-between py-4 px-4 md:px-6 2xl:px-11">
           <div className="flex items-center gap-2 sm:gap-4">
             <Link href="/">
               <div className="flex flex-shrink-0 items-center gap-2 text-white">
@@ -248,6 +271,26 @@ const Header = ({
 
               {/* <!-- Notification Menu Area --> */}
               {/* <DropdownUser userDefault={userDefault} token={token} /> */}
+              <div className="hidden md:flex items-center gap-2">
+                <Button
+                  className="rounded-md text-xs active:scale-90 duration-300"
+                  variant={"danger"}>
+                  <span>Gate Force Open</span>
+                  <span>
+                    <MdWarning className="w-4 h-4" />
+                  </span>
+                </Button>
+
+                <Button
+                  className="rounded-md text-xs bg-green-500 text-white active:scale-90 duration-300"
+                  variant={"success"}>
+                  <span>Gate Force Close</span>
+                  <span>
+                    <MdWarning className="w-4 h-4" />
+                  </span>
+                </Button>
+              </div>
+
               <div className="flex items-center gap-2">
                 <span className="h-12 w-12 rounded-full flex items-center">
                   <Image
