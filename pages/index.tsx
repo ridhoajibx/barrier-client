@@ -92,6 +92,7 @@ interface PageProps {
   page: string;
   token: any;
   refreshToken: any;
+  roles?: string | any;
 }
 
 type Props = {
@@ -106,7 +107,7 @@ const dropdownOption: OptionProps[] = [
 const Home = ({ pageProps }: Props) => {
   const router = useRouter();
   const { query, pathname } = router;
-  const { token, refreshToken } = pageProps;
+  const { token, refreshToken, roles } = pageProps;
 
   const dispatch = useAppDispatch();
   const { data } = useAppSelector(selectAuth);
@@ -765,7 +766,8 @@ const Home = ({ pageProps }: Props) => {
       token={token}
       refreshToken={refreshToken}
       header={"header"}
-      title={"title"}>
+      title={"title"}
+      roles={roles}>
       <div className="relative w-full h-full bg-gray overflow-auto">
         <Navbar />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 md:p-6 2xl:p-10">
@@ -1086,6 +1088,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   // Access cookies using the cookie name
   const token = cookies["accessToken"] || null;
+  const roles = cookies["roles"] || null;
   const refreshToken = cookies["refreshToken"] || null;
 
   if (!token) {
@@ -1098,6 +1101,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   }
 
   return {
-    props: { token, refreshToken },
+    props: { token, refreshToken, roles },
   };
 };

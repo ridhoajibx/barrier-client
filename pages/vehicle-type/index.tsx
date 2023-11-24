@@ -57,6 +57,7 @@ interface PageProps {
   page: string;
   token: any;
   refreshToken: any;
+  roles?: any | string;
 }
 
 type Props = {
@@ -209,7 +210,7 @@ const exData: VehicleProps[] | any[] = [
 export default function VehicleType({ pageProps }: Props) {
   const router = useRouter();
   const { query, pathname } = router;
-  const { token, refreshToken } = pageProps;
+  const { token, refreshToken, roles } = pageProps;
 
   const dispatch = useAppDispatch();
   const { data, error } = useAppSelector(selectAuth);
@@ -596,7 +597,8 @@ export default function VehicleType({ pageProps }: Props) {
       token={token}
       refreshToken={refreshToken}
       header={"Vehicle Type"}
-      title={"type"}>
+      title={"type"}
+      roles={roles}>
       <div className="w-full bg-white h-full overflow-auto relative">
         <Navbar />
         <div className="w-full md:p-6 2xl:p-10">
@@ -892,6 +894,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   // Access cookies using the cookie name
   const token = cookies["accessToken"] || null;
+  const roles = cookies["roles"] || null;
   const refreshToken = cookies["refreshToken"] || null;
 
   if (!token) {
@@ -903,7 +906,16 @@ export const getServerSideProps: GetServerSideProps = async ({
     };
   }
 
+  if (!roles || roles !== "superadmin") {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: true,
+      },
+    };
+  }
+
   return {
-    props: { token, refreshToken },
+    props: { token, refreshToken, roles },
   };
 };

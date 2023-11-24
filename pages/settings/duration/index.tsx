@@ -26,6 +26,7 @@ interface PageProps {
   page: string;
   token: any;
   refreshToken: any;
+  roles?: any | string;
 }
 
 type Props = {
@@ -40,7 +41,7 @@ interface FormValues {
 export default function DurationSetting({ pageProps }: Props) {
   const router = useRouter();
   const { query, pathname } = router;
-  const { token, refreshToken } = pageProps;
+  const { token, refreshToken, roles } = pageProps;
 
   const dispatch = useAppDispatch();
   const { data, error } = useAppSelector(selectAuth);
@@ -200,7 +201,8 @@ export default function DurationSetting({ pageProps }: Props) {
       token={token}
       refreshToken={refreshToken}
       header={"User - Setting"}
-      title={"Settings"}>
+      title={"Settings"}
+      roles={roles}>
       <div className="w-full bg-white h-full overflow-auto relative">
         <nav className="bg-[#DFE8ED] z-99 sticky top-0 border-t-2 border-b-2 border-primary">
           <div className="mx-4 max-w-7xl px-2 sm:px-6 lg:px-8 py-4">
@@ -368,6 +370,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   // Access cookies using the cookie name
   const token = cookies["accessToken"] || null;
+  const roles = cookies["roles"] || null;
   const refreshToken = cookies["refreshToken"] || null;
 
   if (!token) {
@@ -379,7 +382,16 @@ export const getServerSideProps: GetServerSideProps = async ({
     };
   }
 
+  if (!roles || roles !== "superadmin") {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: true,
+      },
+    };
+  }
+
   return {
-    props: { token, refreshToken },
+    props: { token, refreshToken, roles },
   };
 };

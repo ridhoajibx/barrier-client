@@ -53,6 +53,7 @@ type HeaderProps = {
   token?: any;
   refreshToken?: any;
   icons?: any;
+  roles?: string | any;
 };
 
 const Header = ({
@@ -61,6 +62,7 @@ const Header = ({
   title,
   token,
   refreshToken,
+  roles,
 }: HeaderProps) => {
   const url = process.env.API_ENDPOINT;
   const dispatch = useAppDispatch();
@@ -196,6 +198,18 @@ const Header = ({
     },
   ];
 
+  const menuHeaderAdmin = [
+    {
+      name: "Sign Out",
+      description: "",
+      href: () => {
+        isOpenSignOut();
+      },
+      icon: FaSignOutAlt,
+      classIcon: "",
+    },
+  ];
+
   // useEffect(() => {
   //   let unauthorized = message == "Unauthorized";
   //   if (unauthorized) {
@@ -304,7 +318,7 @@ const Header = ({
 
               {/* poopover */}
               <DropodownPopover
-                menus={menuHeader}
+                menus={roles == "superadmin" ? menuHeader : menuHeaderAdmin}
                 label=""
                 icon={MdSettings}
                 classIcon="w-6 h-6"
