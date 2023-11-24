@@ -1,6 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import Header from "./header";
+import { useRouter } from "next/router";
+import { useAppSelector } from "@/redux/Hooks";
+import { selectAuth } from "@/redux/features/AuthenticationReducers";
+import { deleteCookie } from "cookies-next";
 // import Navbar from "./header/Navbar";
 
 type Props = {
@@ -40,6 +44,19 @@ const DashboardLayouts = ({
     "Help & Feedback",
     "Log Out",
   ];
+
+  const { data, pending, error, message } = useAppSelector(selectAuth);
+  const router = useRouter();
+  const { query, pathname } = router;
+
+  useEffect(() => {
+    let unauthorized = message == "Unauthorized";
+    if (unauthorized) {
+      deleteCookie("accessToken");
+      deleteCookie("refreshToken");
+      deleteCookie("roles");
+    }
+  }, [error, message]);
 
   return (
     <div className="bg-gray">

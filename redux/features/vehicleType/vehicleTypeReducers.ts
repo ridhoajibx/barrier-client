@@ -190,7 +190,9 @@ export const updateVehicleType = createAsyncThunk<
   } catch (error: any) {
     const { data, status } = error.response;
     let newError: any = { message: data.message[0] };
-    toast.dark(newError.message);
+    if (error.response.status !== 401) {
+      toast.dark(newError.message);
+    }
     if (error.response && error.response.status === 404) {
       throw new Error("User not found");
     } else {

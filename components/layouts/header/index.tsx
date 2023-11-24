@@ -197,30 +197,13 @@ const Header = ({
   ];
 
   // useEffect(() => {
-  //   let filter = error && message == "jwt expired";
   //   let unauthorized = message == "Unauthorized";
-  //   if (filter) {
-  //     dispatch(
-  //       webRefresh({
-  //         token: refreshToken,
-  //         isSuccess: () => {
-  //           router.replace({ pathname, query });
-  //         },
-  //         isError: () => {
-  //           deleteCookie("role");
-  //           deleteCookie("accessToken");
-  //           deleteCookie("refreshToken");
-  //         },
-  //       })
-  //     );
-  //   } else if (unauthorized) {
+  //   if (unauthorized) {
   //     deleteCookie("accessToken");
   //     deleteCookie("refreshToken");
   //     deleteCookie("roles");
   //   }
   // }, [refreshToken, error, message]);
-
-  console.log({ error, message }, "error-auth");
 
   return (
     <Fragment>
