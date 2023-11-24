@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-duplicate-props */
 /* eslint-disable @next/next/no-img-element */
 import { Inter } from "next/font/google";
 import DashboardLayouts from "@/components/layouts/DashboardLayouts";
@@ -925,7 +926,6 @@ export default function Rfid({ pageProps }: Props) {
             <div className="text-center">
               <h3 className="text-lg font-semibold ">Arrival</h3>
               <img
-                src="/images/barrier-gate.png"
                 src={
                   isCaptured?.cctvArrival
                     ? `https://api-dev.orijinsupremasi.id/rfid/log/files/${isCaptured.cctvArrival}`
@@ -933,14 +933,12 @@ export default function Rfid({ pageProps }: Props) {
                 }
                 alt={`Image`}
                 className="w-100 h-50  object-cover rounded-xl"
-                className="w-100 h-50 object-cover rounded-xl"
               />
             </div>
             <div className="text-center">
               <h3 className="text-lg font-semibold ">Departure</h3>
 
               <img
-                src="/images/barrier-gate.png"
                 src={
                   isCaptured?.cctvDeparture
                     ? `https://api-dev.orijinsupremasi.id/rfid/log/files/${isCaptured.cctvDeparture}`
