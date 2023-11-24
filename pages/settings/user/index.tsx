@@ -478,13 +478,13 @@ export default function UserSetting({ pageProps }: Props) {
               Idle Status
             </ActiveLink>
 
-            <ActiveLink
+            {/* <ActiveLink
               pages={"manual"}
               href={{ pathname: "/settings/manual" }}
               activeClassName="text-primary border-b-2 border-primary"
               className="w-full lg:justify-center text-sm lg:text-base text-gray-6 hover:text-primary">
               Manual
-            </ActiveLink>
+            </ActiveLink> */}
           </div>
 
           <div className="w-full grid grid-cols-1 lg:grid-cols-5 gap-2.5 p-4">
