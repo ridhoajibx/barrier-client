@@ -197,6 +197,7 @@ export default function FormUser(props: Props) {
               className="text-gray-500 font-semibold text-sm"
               htmlFor="fullName">
               Role
+              <span>*</span>
             </label>
             <div className="relative">
               <Controller
@@ -246,6 +247,7 @@ export default function FormUser(props: Props) {
               className="text-gray-500 font-semibold text-sm"
               htmlFor="fullName">
               Full Name
+              <span>*</span>
             </label>
             <div className="w-full flex">
               <input
@@ -277,6 +279,7 @@ export default function FormUser(props: Props) {
               className="text-gray-500 font-semibold text-sm"
               htmlFor="username">
               Username
+              <span>*</span>
             </label>
             <div className="w-full flex">
               <input
@@ -308,6 +311,7 @@ export default function FormUser(props: Props) {
               className="text-gray-500 font-semibold text-sm"
               htmlFor="password">
               Password
+              <span>*</span>
             </label>
             <div className="relative w-full flex">
               <input
@@ -325,7 +329,7 @@ export default function FormUser(props: Props) {
               />
               <button
                 type="button"
-                className="absolute z-40 right-4 top-4 text-gray-5 focus:outline-none"
+                className="absolute z-40 right-4 top-3.5 text-gray-5 focus:outline-none"
                 onClick={() => setIsHidden((prev) => !prev)}>
                 {isHidden ? (
                   <FaEyeSlash className="w-5 h-5" />
