@@ -214,11 +214,11 @@ const Header = ({
   ];
 
   const menuHeaders = useMemo(() => {
-    if (roles === "superadmin") {
+    if (data?.roles && data?.roles === "superadmin") {
       return menus;
     }
     return menusAdmin;
-  }, [roles, menus, menusAdmin]);
+  }, [data?.roles, menus, menusAdmin]);
 
   // useEffect(() => {
   //   let unauthorized = message == "Unauthorized";

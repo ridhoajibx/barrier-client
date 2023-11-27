@@ -766,8 +766,7 @@ const Home = ({ pageProps }: Props) => {
       token={token}
       refreshToken={refreshToken}
       header={"header"}
-      title={"title"}
-      roles={roles}>
+      title={"title"}>
       <div className="relative w-full h-full bg-gray overflow-auto">
         <Navbar />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 md:p-6 2xl:p-10">
