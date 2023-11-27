@@ -144,6 +144,9 @@ const Header = ({
   ];
   const [loading, setLoading] = useState<boolean>(false);
 
+  const [isOpenGate, setIsOpenGate] = useState<boolean>(false);
+  const [isCloseGate, setIsCloseGate] = useState<boolean>(false);
+
   const isOpenSignOut = () => {
     setIsSignOut(true);
   };

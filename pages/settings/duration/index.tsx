@@ -127,8 +127,8 @@ export default function DurationSetting({ pageProps }: Props) {
         throw response;
       }
     } catch (error: any) {
-      const { data, status } = error.response;
-      let newError: any = { message: data.message[0] };
+      const { data, status } = error?.response;
+      let newError: any = { message: data?.message[0] };
       employee = null;
       guest = null;
       toast.dark(newError.message);
@@ -194,6 +194,32 @@ export default function DurationSetting({ pageProps }: Props) {
     // console.log(newObj, "form-result");
   };
 
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+    dispatch(
+      getAuthMe({
+        token,
+        callback: () => {
+          dispatch(
+            webRefresh({
+              token: refreshToken,
+              isSuccess: () => {
+                router.replace({ pathname, query });
+              },
+              isError: () => {
+                deleteCookie("role");
+                deleteCookie("accessToken");
+                deleteCookie("refreshToken");
+              },
+            })
+          );
+        },
+      })
+    );
+  }, [token, refreshToken]);
+
   return (
     <DashboardLayouts
       userDefault="/images/logo.png"
@@ -237,13 +263,13 @@ export default function DurationSetting({ pageProps }: Props) {
               Idle Status
             </ActiveLink>
 
-            {/* <ActiveLink
-              pages={"manual"}
-              href={{ pathname: "/settings/manual" }}
+            <ActiveLink
+              pages={"gatee-password"}
+              href={{ pathname: "/settings/gate" }}
               activeClassName="text-primary border-b-2 border-primary"
               className="w-full lg:justify-center text-sm lg:text-base text-gray-6 hover:text-primary">
-              Manual
-            </ActiveLink> */}
+              Gate Password
+            </ActiveLink>
           </div>
 
           <div className="w-full lg:w-1/2 flex flex-col lg:flex-row gap-2">

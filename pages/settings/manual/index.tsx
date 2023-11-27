@@ -140,11 +140,11 @@ export default function ManualSetting({ pageProps }: Props) {
     setGuestDuration(guest);
   };
 
-  useEffect(() => {
-    if (token) {
-      getIdleDuration({ token, params: "" });
-    }
-  }, [token]);
+  // useEffect(() => {
+  //   if (token) {
+  //     getIdleDuration({ token, params: "" });
+  //   }
+  // }, [token]);
 
   // end-duration
 

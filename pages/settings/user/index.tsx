@@ -435,6 +435,32 @@ export default function UserSetting({ pageProps }: Props) {
     }
   };
 
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+    dispatch(
+      getAuthMe({
+        token,
+        callback: () => {
+          dispatch(
+            webRefresh({
+              token: refreshToken,
+              isSuccess: () => {
+                router.replace({ pathname, query });
+              },
+              isError: () => {
+                deleteCookie("role");
+                deleteCookie("accessToken");
+                deleteCookie("refreshToken");
+              },
+            })
+          );
+        },
+      })
+    );
+  }, [token, refreshToken]);
+
   return (
     <DashboardLayouts
       userDefault="/images/logo.png"
@@ -478,13 +504,13 @@ export default function UserSetting({ pageProps }: Props) {
               Idle Status
             </ActiveLink>
 
-            {/* <ActiveLink
-              pages={"manual"}
-              href={{ pathname: "/settings/manual" }}
+            <ActiveLink
+              pages={"gatee-password"}
+              href={{ pathname: "/settings/gate" }}
               activeClassName="text-primary border-b-2 border-primary"
               className="w-full lg:justify-center text-sm lg:text-base text-gray-6 hover:text-primary">
-              Manual
-            </ActiveLink> */}
+              Gate Password
+            </ActiveLink>
           </div>
 
           <div className="w-full grid grid-cols-1 lg:grid-cols-5 gap-2.5 p-4">
