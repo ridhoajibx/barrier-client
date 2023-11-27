@@ -914,7 +914,7 @@ export default function Rfid({ pageProps }: Props) {
       </Modal>
 
       {/* picture cctv */}
-      <Modal size="medium" onClose={isClosePicture} isOpen={isPicture}>
+      <Modal size="full" onClose={isClosePicture} isOpen={isPicture}>
         <Fragment>
           <ModalHeader
             className="p-4 border-b-2 border-gray mb-3"
@@ -925,7 +925,7 @@ export default function Rfid({ pageProps }: Props) {
             </h3>
           </ModalHeader>
           <div className="w-full flex flex-row justify-between px-10 py-5 gap-10 mb-3">
-            <div className="text-center">
+            <div className="text-center w-1/2">
               <h3 className="text-lg font-semibold ">Arrival</h3>
               <img
                 src={
@@ -934,10 +934,10 @@ export default function Rfid({ pageProps }: Props) {
                     : "/images/barrier-gate.png"
                 }
                 alt={`Image`}
-                className="w-100 h-50  object-cover rounded-xl"
+                className="w-full object-cover rounded-xl"
               />
             </div>
-            <div className="text-center">
+            <div className="text-center w-1/2">
               <h3 className="text-lg font-semibold ">Departure</h3>
 
               <img
@@ -947,7 +947,7 @@ export default function Rfid({ pageProps }: Props) {
                     : "/images/barrier-gate.png"
                 }
                 alt={`Image`}
-                className="w-100 h-50 object-cover rounded-xl"
+                className="w-full object-cover rounded-xl"
               />
             </div>
           </div>
