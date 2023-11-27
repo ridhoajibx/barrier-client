@@ -906,15 +906,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     };
   }
 
-  if (!roles || roles !== "superadmin") {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: true,
-      },
-    };
-  }
-
   return {
     props: { token, refreshToken, roles },
   };
