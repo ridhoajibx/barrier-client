@@ -45,6 +45,8 @@ import {
 import { toast } from "react-toastify";
 import { deleteCookie } from "cookies-next";
 import Button from "@/components/button/Button";
+import FormOpenGate from "@/components/forms/gate/FormOpenGate";
+import FormCloseGate from "@/components/forms/gate/FormCloseGate";
 
 type HeaderProps = {
   header?: string;
@@ -229,11 +231,15 @@ const Header = ({
   //   }
   // }, [refreshToken, error, message]);
 
+  console.log(isOpenGate, "status");
+
   return (
     <Fragment>
       <header className="static z-999 flex flex-col md:flex-row w-full bg-white drop-shadow-none">
         <div className="flex md:hidden items-center justify-center py-2 md:py-0 gap-2">
           <Button
+            type="button"
+            onClick={() => setIsOpenGate(true)}
             className="rounded-md text-xs active:scale-90 duration-300"
             variant={"danger"}>
             <span>Gate Force Open</span>
@@ -243,6 +249,8 @@ const Header = ({
           </Button>
 
           <Button
+            type="button"
+            onClick={() => setIsCloseGate(true)}
             className="rounded-md text-xs bg-green-500 text-white active:scale-90 duration-300"
             variant={"success"}>
             <span>Gate Force Close</span>
@@ -280,6 +288,8 @@ const Header = ({
               {/* <DropdownUser userDefault={userDefault} token={token} /> */}
               <div className="hidden md:flex items-center gap-2">
                 <Button
+                  type="button"
+                  onClick={() => setIsOpenGate(true)}
                   className="rounded-md text-xs active:scale-90 duration-300"
                   variant={"danger"}>
                   <span>Gate Force Open</span>
@@ -289,6 +299,8 @@ const Header = ({
                 </Button>
 
                 <Button
+                  type="button"
+                  onClick={() => setIsCloseGate(true)}
                   className="rounded-md text-xs bg-green-500 text-white active:scale-90 duration-300"
                   variant={"success"}>
                   <span>Gate Force Close</span>
@@ -382,6 +394,22 @@ const Header = ({
             </button>
           </div>
         </div>
+      </Modal>
+
+      {/* open gate */}
+      <Modal
+        isOpen={isOpenGate}
+        onClose={() => setIsOpenGate(false)}
+        size="small">
+        <FormOpenGate token={token} isClose={() => setIsOpenGate(false)} />
+      </Modal>
+
+      {/* close gate */}
+      <Modal
+        isOpen={isCloseGate}
+        onClose={() => setIsCloseGate(false)}
+        size="small">
+        <FormCloseGate token={token} isClose={() => setIsCloseGate(false)} />
       </Modal>
     </Fragment>
   );
