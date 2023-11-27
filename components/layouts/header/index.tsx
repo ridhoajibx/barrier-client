@@ -171,7 +171,7 @@ const Header = ({
     return newObj;
   }, [data]);
 
-  const menuHeader = [
+  const menus = [
     {
       name: "Settings",
       description: "",
@@ -198,7 +198,7 @@ const Header = ({
     },
   ];
 
-  const menuHeaderAdmin = [
+  const menusAdmin = [
     {
       name: "Sign Out",
       description: "",
@@ -209,6 +209,13 @@ const Header = ({
       classIcon: "",
     },
   ];
+
+  const menuHeaders = useMemo(() => {
+    if (roles === "superadmin") {
+      return menus;
+    }
+    return menusAdmin;
+  }, [roles, menus, menusAdmin]);
 
   // useEffect(() => {
   //   let unauthorized = message == "Unauthorized";
@@ -318,7 +325,7 @@ const Header = ({
 
               {/* poopover */}
               <DropodownPopover
-                menus={roles == "superadmin" ? menuHeader : menuHeaderAdmin}
+                menus={menuHeaders}
                 label=""
                 icon={MdSettings}
                 classIcon="w-6 h-6"
