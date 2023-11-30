@@ -53,7 +53,7 @@ const DashboardLayouts = ({
 
   useEffect(() => {
     let unauthorized = message == "Unauthorized";
-    if (unauthorized) {
+    if (error && unauthorized) {
       deleteCookie("accessToken");
       deleteCookie("refreshToken");
       deleteCookie("roles");
