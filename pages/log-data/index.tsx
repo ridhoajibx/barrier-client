@@ -774,12 +774,12 @@ export default function Rfid({ pageProps }: Props) {
                 className="text-sm font-normal text-gray-5 w-full lg:w-2/10"
                 classNamePrefix=""
                 formatOptionLabel=""
-                instanceId="1"
+                instanceId="2"
                 isDisabled={false}
                 isMulti={false}
                 placeholder="All Type..."
                 options={RfidTypeOptions}
-                icon=""
+                icon="MdSearch"
                 isClearable
               />
             </div>

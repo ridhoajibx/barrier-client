@@ -786,7 +786,7 @@ const Home = ({ pageProps }: Props) => {
                   isMulti={false}
                   placeholder="Select ..."
                   options={dropdownOption}
-                  icon=""
+                  icon="MdSearch"
                 />
               </div>
 
