@@ -71,6 +71,7 @@ export const SearchInput = ({
           )}
           <input
             type="text"
+            autoComplete="off"
             placeholder={placeholder || "Search..."}
             onChange={handleChange}
             ref={inputRef}

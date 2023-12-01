@@ -142,6 +142,7 @@ export default function FormOpenGate(props: Props) {
                 type={isHidden ? "password" : "text"}
                 placeholder="Password"
                 autoFocus
+                autoComplete="off"
                 className={`bg-white w-full text-sm rounded-lg border border-stroke bg-transparent py-3 px-4 outline-none focus:border-primary focus-visible:shadow-none disabled:border-0 disabled:bg-transparent`}
                 {...register("gatePassword", {
                   required: {
