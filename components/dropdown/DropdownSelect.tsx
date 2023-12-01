@@ -132,6 +132,7 @@ export default function DropdownSelect({
       styles={customStyles}
       menuIsOpen={menuIsOpen}
       autoFocus={false}
+      aria-autocomplete="off"
     />
   );
 }
