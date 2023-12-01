@@ -71,7 +71,7 @@ export const SearchInput = ({
           )}
           <input
             type="text"
-            placeholder={placeholder}
+            placeholder={placeholder || "Search..."}
             onChange={handleChange}
             ref={inputRef}
             className={`w-full bg-transparent rounded-lg border border-stroke py-4 pl-10 pr-6 outline-none focus:border-primary focus-visible:shadow-none ${className}`}
