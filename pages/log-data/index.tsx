@@ -777,7 +777,7 @@ export default function Rfid({ pageProps }: Props) {
                 instanceId="2"
                 isDisabled={false}
                 isMulti={false}
-                placeholder="All Type..."
+                placeholder="Type..."
                 options={RfidTypeOptions}
                 icon="MdSearch"
                 isClearable

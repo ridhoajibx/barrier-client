@@ -95,12 +95,12 @@ export default function DropdownSelect({
 
   const ref = useRef<SelectInstance>(null);
 
-  useEffect(() => {
-    const selectEl = ref.current;
-    if (!selectEl) return;
-    if (menuIsOpen) selectEl.blur();
-    else selectEl.focus();
-  }, []);
+  // useEffect(() => {
+  //   const selectEl = ref.current;
+  //   if (!selectEl) return;
+  //   if (menuIsOpen) selectEl.blur();
+  //   else selectEl.focus();
+  // }, []);
 
   return (
     <Select
@@ -131,6 +131,7 @@ export default function DropdownSelect({
       })}
       styles={customStyles}
       menuIsOpen={menuIsOpen}
+      autoFocus={false}
     />
   );
 }
