@@ -369,7 +369,7 @@ export default function Rfid({ pageProps }: Props) {
     const search = {
       $and: [
         {
-          createdAt: {
+          arrival: {
             $gte:
               moment(
                 query?.arrival
