@@ -902,7 +902,7 @@ const Home = ({ pageProps }: Props) => {
                 <div className="w-full bg-white p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-4 border-b border-gray">
                   <div className="w-full p-2 text-sm">
                     <h3 className="text-xs lg:text-sm text-gray-5">
-                      Weekly Arrival
+                      Today Arrival
                     </h3>
                     <div className="w-full flex items-center gap-1">
                       <span>
