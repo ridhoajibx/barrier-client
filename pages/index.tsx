@@ -793,7 +793,7 @@ const Home = ({ pageProps }: Props) => {
               {/* arrival */}
               <div className="w-full mb-3">
                 {/* header */}
-                <div className="w-full bg-white rounded-lg shadow-card p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-4">
+                <div className="w-full bg-white rounded-lg shadow-card p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-4">
                   <div className="w-full p-2">
                     <h3 className="text-xs lg:text-sm text-gray-5">
                       Weekly Arrival
@@ -828,7 +828,7 @@ const Home = ({ pageProps }: Props) => {
                       </div>
                     </div>
                   </div>
-                  <div className="w-full p-2">
+                  {/* <div className="w-full p-2">
                     <h3 className="text-xs lg:text-sm text-gray-5">
                       Avarage Stay
                     </h3>
@@ -843,7 +843,7 @@ const Home = ({ pageProps }: Props) => {
                         <span>Hours</span>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                   <div className="w-full p-2">
                     <h3 className="text-xs lg:text-sm text-gray-5">Guest</h3>
                     <div className="w-full flex items-center gap-1">
@@ -855,7 +855,7 @@ const Home = ({ pageProps }: Props) => {
                           {reports?.guest?.total || 0}
                         </span>
                         <span>
-                          {reports?.guest?.total > 1 ? "Areas" : "Area"}
+                          {reports?.guest?.total > 1 ? "People" : "Person"}
                         </span>
                       </div>
                     </div>
@@ -944,7 +944,9 @@ const Home = ({ pageProps }: Props) => {
                         <span className="font-bold">
                           {dailyReport?.guest || 0}
                         </span>
-                        <span>{dailyReport?.guest > 1 ? "Areas" : "Area"}</span>
+                        <span>
+                          {dailyReport?.guest > 1 ? "People" : "Person"}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -1034,13 +1036,13 @@ const Home = ({ pageProps }: Props) => {
                                         data: chart?.data,
                                         index: 1,
                                       }).value
-                                    } areas`
+                                    } people`
                                   : `${
                                       valueDoughnut({
                                         data: chart?.data,
                                         index: 1,
                                       }).value
-                                    } area`}
+                                    } person`}
                               </p>
                             </div>
                           </div>
