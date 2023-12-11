@@ -932,7 +932,7 @@ export default function Rfid({ pageProps }: Props) {
               <img
                 src={
                   isCaptured?.cctvArrival
-                    ? `${url}${isCaptured.cctvArrival}`
+                    ? `${url}rfid/log/files/${isCaptured.cctvArrival}`
                     : "https://api-dev.orijinsupremasi.id/rfid/log/files/images/barrier-gate.png"
                 }
                 alt={`Image`}
@@ -945,7 +945,7 @@ export default function Rfid({ pageProps }: Props) {
               <img
                 src={
                   isCaptured?.cctvDeparture
-                    ? `${url}${isCaptured.cctvDeparture}`
+                    ? `${url}rfid/log/files/${isCaptured.cctvDeparture}`
                     : "https://api-dev.orijinsupremasi.id/rfid/log/files/images/barrier-gate.png"
                 }
                 alt={`Image`}
