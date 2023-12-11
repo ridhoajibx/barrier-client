@@ -193,6 +193,8 @@ export default function Rfid({ pageProps }: Props) {
   // duration
   const { duration } = useAppSelector(selectParkingManagement);
 
+  const url = process.env.API_ENDPOINT;
+
   useEffect(() => {
     if (token) {
       dispatch(
@@ -930,8 +932,8 @@ export default function Rfid({ pageProps }: Props) {
               <img
                 src={
                   isCaptured?.cctvArrival
-                    ? `https://api-dev.orijinsupremasi.id/rfid/log/files/${isCaptured.cctvArrival}`
-                    : "/images/barrier-gate.png"
+                    ? `${url}${isCaptured.cctvArrival}`
+                    : "https://api-dev.orijinsupremasi.id/rfid/log/files/images/barrier-gate.png"
                 }
                 alt={`Image`}
                 className="w-full object-cover rounded-xl"
@@ -943,8 +945,8 @@ export default function Rfid({ pageProps }: Props) {
               <img
                 src={
                   isCaptured?.cctvDeparture
-                    ? `https://api-dev.orijinsupremasi.id/rfid/log/files/${isCaptured.cctvDeparture}`
-                    : "/images/barrier-gate.png"
+                    ? `${url}${isCaptured.cctvDeparture}`
+                    : "https://api-dev.orijinsupremasi.id/rfid/log/files/images/barrier-gate.png"
                 }
                 alt={`Image`}
                 className="w-full object-cover rounded-xl"
