@@ -91,7 +91,7 @@ export default function FormOpenGate(props: Props) {
       const response = await axios.post(`gate/open`, newData, config);
       const { data, status } = response;
       if (status == 200) {
-        toast.dark("Gate has been closed!");
+        toast.dark("Gate has been opened!");
         reset({ gatePassword: null });
         isClose();
       } else {
