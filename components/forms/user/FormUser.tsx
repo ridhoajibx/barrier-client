@@ -77,6 +77,7 @@ type FormValues = {
 const roleOptions: OptionProps[] = [
   { value: "admin", label: "Admin" },
   { value: "superadmin", label: "Superadmin" },
+  { value: "security", label: "Security" },
 ];
 
 export default function FormUser(props: Props) {

@@ -709,7 +709,10 @@ export default function Rfid({ pageProps }: Props) {
       <div className="w-full bg-white h-full overflow-auto relative">
         <Navbar />
         <div className="w-full md:p-6 2xl:p-10">
-          <div className="w-full grid grid-cols-1 lg:grid-cols-7 gap-2.5 p-4">
+          <div
+            className={`w-full grid grid-cols-1 gap-2.5 p-4 ${
+              roles !== "superadmin" ? "lg:grid-cols-6" : "lg:grid-cols-7"
+            }`}>
             <div className="w-full lg:col-span-2">
               <SearchInput
                 className="w-full text-sm rounded-xl"
@@ -797,7 +800,9 @@ export default function Rfid({ pageProps }: Props) {
             <Button
               type="button"
               variant="primary"
-              className="rounded-lg hover:opacity-70 active:scale-90"
+              className={`rounded-lg hover:opacity-70 active:scale-90 ${
+                roles !== "superadmin" ? "hidden" : ""
+              }`}
               onClick={isOpenImport}>
               <span className="tex-sm">Import</span>
               <MdUpload className="w-4 h-4" />
@@ -1045,6 +1050,15 @@ export const getServerSideProps: GetServerSideProps = async ({
     return {
       redirect: {
         destination: "/login",
+        permanent: true,
+      },
+    };
+  }
+
+  if (!roles || roles == "security") {
+    return {
+      redirect: {
+        destination: "/",
         permanent: true,
       },
     };

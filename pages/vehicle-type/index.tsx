@@ -906,6 +906,15 @@ export const getServerSideProps: GetServerSideProps = async ({
     };
   }
 
+  if (!roles || roles == "security") {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: true,
+      },
+    };
+  }
+
   return {
     props: { token, refreshToken, roles },
   };
