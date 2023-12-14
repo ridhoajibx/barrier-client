@@ -95,11 +95,11 @@ export const webLogin = createAsyncThunk<any, AuthData, { state: RootState }>(
       if (status == 200) {
         toast.dark("Sign in successfully!");
         setCookie("accessToken", data?.accessToken, {
-          secure: true,
+          secure: false,
           maxAge: 60 * 60 * 24,
         });
         setCookie("refreshToken", data?.refreshToken, {
-          secure: true,
+          secure: false,
           maxAge: 60 * 60 * 24,
         });
         params.callback();
@@ -137,11 +137,11 @@ export const webRefresh = createAsyncThunk<
     const { data, status } = response;
     if (status == 200) {
       setCookie("accessToken", data?.accessToken, {
-        secure: true,
+        secure: false,
         maxAge: 60 * 60 * 24,
       });
       setCookie("refreshToken", data?.refreshToken, {
-        secure: true,
+        secure: false,
         maxAge: 60 * 60 * 24,
       });
       params.isSuccess();
@@ -178,7 +178,7 @@ export const getAuthMe = createAsyncThunk<any, MyData, { state: RootState }>(
       const { data, status } = response;
       if (status == 200) {
         setCookie("roles", data?.role, {
-          secure: true,
+          secure: false,
           maxAge: 60 * 60 * 24,
         });
         return data;
