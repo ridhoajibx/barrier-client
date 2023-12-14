@@ -340,12 +340,12 @@ export default function LogGate({ pageProps }: Props) {
     qb.search(search);
     if (!query?.sort) {
       qb.sortBy({
-        field: `updatedAt`,
+        field: `time`,
         order: "DESC",
       });
     } else {
       qb.sortBy({
-        field: `adminUsername`,
+        field: `adminFullname`,
         order: !sort?.value ? "ASC" : sort.value,
       });
     }
@@ -387,13 +387,46 @@ export default function LogGate({ pageProps }: Props) {
   const columns = useMemo<ColumnDef<LogGateProps, any>[]>(
     () => [
       {
-        accessorKey: "adminUsername",
-        header: (info) => <div className="uppercase">Username</div>,
-        cell: ({ getValue, row }) => {
-          return <div className="w-55">{getValue() ? getValue() : "-"}</div>;
+        accessorKey: "gateStatus",
+        cell: ({ row, getValue }) => {
+          if (getValue() == "Open") {
+            return (
+              <div className="w-55 text-danger">
+                {getValue() ? getValue() : "-"}
+              </div>
+            );
+          } else if (getValue() == "Close") {
+            return (
+              <div className="w-55 text-green-500">
+                {getValue() ? getValue() : "-"}
+              </div>
+            );
+          }
+          return (
+            <div className="w-55 text-green-500">
+              {getValue() ? getValue() : "-"}
+            </div>
+          );
         },
+        header: (props) => (
+          <div className="w-full text-left uppercase">Status</div>
+        ),
         footer: (props) => props.column.id,
         enableColumnFilter: false,
+        size: 150,
+      },
+      {
+        accessorKey: "time",
+        cell: ({ row, getValue }) => {
+          let time = dateFormat(getValue());
+          return <div className="w-55">{getValue() ? time : "-"}</div>;
+        },
+        header: (props) => (
+          <div className="w-full text-left uppercase">Time</div>
+        ),
+        footer: (props) => props.column.id,
+        enableColumnFilter: false,
+        size: 150,
       },
       {
         accessorKey: "adminFullName",
@@ -414,31 +447,6 @@ export default function LogGate({ pageProps }: Props) {
         },
         header: (props) => (
           <div className="w-full text-left uppercase">Role</div>
-        ),
-        footer: (props) => props.column.id,
-        enableColumnFilter: false,
-        size: 150,
-      },
-      {
-        accessorKey: "gateStatus",
-        cell: ({ row, getValue }) => {
-          return <div className="w-55">{getValue() ? getValue() : "-"}</div>;
-        },
-        header: (props) => (
-          <div className="w-full text-left uppercase">Status</div>
-        ),
-        footer: (props) => props.column.id,
-        enableColumnFilter: false,
-        size: 150,
-      },
-      {
-        accessorKey: "time",
-        cell: ({ row, getValue }) => {
-          let time = timeFormat(getValue());
-          return <div className="w-55">{getValue() ? time : "-"}</div>;
-        },
-        header: (props) => (
-          <div className="w-full text-left uppercase">Time</div>
         ),
         footer: (props) => props.column.id,
         enableColumnFilter: false,
