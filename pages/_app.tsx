@@ -16,8 +16,6 @@ const MyApp: FC<AppProps> = ({ Component, ...pageProps }) => {
   const { store, props } = wrapper.useWrappedStore(pageProps);
   axios.defaults.baseURL = process.env.API_ENDPOINT;
 
-  // console.log(store, "store");
-
   return (
     <Provider store={store}>
       <NextNProgress
