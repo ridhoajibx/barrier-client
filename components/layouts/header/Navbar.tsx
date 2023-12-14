@@ -186,6 +186,14 @@ const Navbar = ({ header, userDefault, title, token }: HeaderProps) => {
                 </ActiveLink>
 
                 <ActiveLink
+                  pages={"log-gate"}
+                  href={{ pathname: "/log-gate" }}
+                  activeClassName=""
+                  className="w-full lg:justify-center text-sm lg:text-base text-gray hover:text-white">
+                  Log Gate
+                </ActiveLink>
+
+                <ActiveLink
                   pages={"vehicle-type"}
                   href={{ pathname: "/vehicle-type" }}
                   activeClassName=""
@@ -231,6 +239,14 @@ const Navbar = ({ header, userDefault, title, token }: HeaderProps) => {
               activeClassName=""
               className="w-full lg:justify-center text-base lg:text-lg text-gray hover:text-white">
               Log Data
+            </ActiveLink>
+
+            <ActiveLink
+              pages={"log-gate"}
+              href={{ pathname: "/log-gate" }}
+              activeClassName=""
+              className="w-full lg:justify-center text-base lg:text-lg text-gray hover:text-white">
+              Log Gate
             </ActiveLink>
 
             <ActiveLink

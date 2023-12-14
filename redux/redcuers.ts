@@ -9,6 +9,7 @@ import dailyReducers from "./features/dashboard/dailyReducers";
 import reportReducers from "./features/dashboard/reportReducers";
 import arrivalReducers from "./features/dashboard/arrivalReducers";
 import peakTimeReducers from "./features/dashboard/peekTimeReducers";
+import logGateReducers from "./features/log-gate/logGateReducers";
 
 export const combinedReducer = combineReducers({
   //All reducer
@@ -31,4 +32,6 @@ export const combinedReducer = combineReducers({
   peakTimeManagement: peakTimeReducers,
   // data dashboard parking & duration
   parkingManagement: parkingReducers,
+  // log-gate
+  logGateManagement: logGateReducers,
 });

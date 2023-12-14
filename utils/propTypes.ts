@@ -48,6 +48,19 @@ export interface RfidLogProps {
   cardNumber?: string | any;
 }
 
+export interface LogGateProps {
+  id?: number | string | any;
+  createdAt?: string | any;
+  updatedAt?: string | any;
+  adminFullName: string | any;
+  adminUsername: string | any;
+  adminRole: string | any;
+  gateStatus: string | any;
+  gateImageIn: string | any;
+  gateImageOut: string | any;
+  time: null;
+}
+
 export interface ParkingProps {
   id?: number | string | any;
   createdAt?: string | any;
